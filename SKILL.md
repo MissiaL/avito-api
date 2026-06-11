@@ -1,6 +1,6 @@
 ---
 name: avito-api
-description: Use whenever the user wants to interact with Avito (avito.ru) for business — managing listings, replying to messenger chats, working with delivery/orders, vacancies/CVs (Авито.Работа), Autoload, Автотека reports, call tracking, tariffs, CPA, statistics, promotion (продвижение объявлений), Avito Ads (Авито Реклама), realty analytics, ratings, short-term rent, or any other Avito Business API endpoint. Trigger on phrases like "Avito API", "авито апи", "объявления на авито", "чаты авито", "Автозагрузка", "Авито Работа", "Автотека", "продвижение на авито", "Авито Реклама", "calltracking авито", or any URL under api.avito.ru. The skill bundles the full OpenAPI 3.0 spec from the official catalog (227 endpoints, 24 sections), per-section integration docs, an OAuth2 token helper, and a lookup tool — use it instead of guessing paths or schemas, even for endpoints that look obvious.
+description: Use when the user works with Avito (avito.ru) for business via API — объявления, чаты, доставка/заказы, Авито.Работа, Автозагрузка, Автотека, продвижение, Авито Реклама, аналитика, тарифы, рейтинги. Triggers: "Avito API", "авито апи", "объявления на авито", "чаты авито", "Автотека", "Авито Реклама", api.avito.ru.
 ---
 
 # Avito Business API
