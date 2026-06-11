@@ -1,6 +1,6 @@
 # Avito API — индекс категорий
 
-Источник: официальный каталог `developers.avito.ru/api-catalog` (`/web/1/openapi/list` + `/web/1/openapi/info/<slug>`). Полный спек: [avito-api-openapi.json](./avito-api-openapi.json) (~1.7 МБ, 197 путей / 203 операций / 23 разделов).
+Источник: официальный каталог `developers.avito.ru/api-catalog` (`/web/1/openapi/list` + `/web/1/openapi/info/<slug>`). Полный спек: [avito-api-openapi.json](./avito-api-openapi.json) (~1.9 МБ, 227 путей / 234 операций / 24 разделов).
 
 Документация по разделам — в [sections/](./sections/) (интеграция, примеры, sandbox).
 
@@ -100,7 +100,34 @@
 - `GET    /job/v2/vacancy/dict` — Получение списка доступных словарей
 - `GET    /job/v2/vacancy/dict/{dictionary_id}` — Получение доступных значений списка по ID словаря
 
-## Автозагрузка (17) — [docs](./sections/autoload.md)
+## Авито Реклама (24) — [docs](./sections/ads.md)
+
+- `GET    /ads/v1/account/{accountID}` — Получить аккаунт по ID
+- `POST   /ads/v1/account/{accountID}` — Создать аккаунт в песочнице
+- `POST   /ads/v1/account/{accountID}/add-user` — Добавить пользователя в аккаунт
+- `POST   /ads/v1/account/{accountID}/advertisers` — Получить список рекламодателей по фильтрам
+- `GET    /ads/v1/account/{accountID}/balance` — Получить баланс аккаунта по ID
+- `POST   /ads/v1/account/{accountID}/bonus-transfer` — Перевод бонусов между аккаунтом родителем и дочерними на одном договоре
+- `POST   /ads/v1/account/{accountID}/campaigns` — Получить список кампаний по фильтрам
+- `POST   /ads/v1/account/{accountID}/campaigns/{campaignID}/creatives/stats` — Получить статистику по креативам кампании
+- `POST   /ads/v1/account/{accountID}/campaigns/{campaignID}/groups/stats` — Получить статистику по группам кампании
+- `POST   /ads/v1/account/{accountID}/campaigns/{campaignID}/stats` — Получить статистику по кампании
+- `GET    /ads/v1/account/{accountID}/children` — Получить список дочерних аккаунтов
+- `GET    /ads/v1/account/{accountID}/children-with-balances` — Получить список дочерних аккаунтов с балансами
+- `POST   /ads/v1/account/{accountID}/contracts` — Получить список договоров по фильтрам
+- `POST   /ads/v1/account/{accountID}/create-advertiser` — Создать рекламодателя
+- `POST   /ads/v1/account/{accountID}/create-contract` — Создание изначального договора
+- `POST   /ads/v1/account/{accountID}/create-nonpayer-child-account` — Создание дочернего аккаунта на договоре родителя
+- `POST   /ads/v1/account/{accountID}/creatives` — Получить список креативов по фильтрам
+- `DELETE /ads/v1/account/{accountID}/delete-user/{userID}` — Удалить пользователя из аккаунта
+- `POST   /ads/v1/account/{accountID}/funds-transfer` — Перевод денег между аккаунтом родителем и дочерними на одном договоре
+- `POST   /ads/v1/account/{accountID}/group/{groupID}/change-budget` — Изменить бюджет группы
+- `POST   /ads/v1/account/{accountID}/group/{groupID}/change-price` — Изменить цену группы
+- `POST   /ads/v1/account/{accountID}/groups` — Получить список групп по фильтрам
+- `POST   /ads/v1/account/{accountID}/set-user-role` — Изменить роль пользователя в аккаунте
+- `GET    /ads/v1/account/{accountID}/users` — Получить список пользователей аккаунта
+
+## Автозагрузка (22) — [docs](./sections/autoload.md)
 
 - `GET    /autoload/v1/profile` — Получение профиля пользователя автозагрузки (deprecated) ⚠️ deprecated
 - `POST   /autoload/v1/profile` — Создание/редактирование настроек профиля пользователя автозагрузки (deprecated) ⚠️ deprecated
@@ -111,14 +138,19 @@
 - `GET    /autoload/v2/items/avito_ids` — ID объявлений на Авито
 - `GET    /autoload/v2/profile` — Получение профиля пользователя автозагрузки
 - `POST   /autoload/v2/profile` — Создание/редактирование настроек профиля пользователя автозагрузки
-- `GET    /autoload/v2/reports` — Список отчётов автозагрузки
-- `GET    /autoload/v2/reports/items` — Объявления по ID в автозагрузке
+- `GET    /autoload/v2/reports` — Список отчётов автозагрузки (deprecated) ⚠️ deprecated
+- `GET    /autoload/v2/reports/items` — Объявления по ID в автозагрузке (deprecated) ⚠️ deprecated
 - `GET    /autoload/v2/reports/last_completed_report` — Статистика по последней выгрузке (deprecated) ⚠️ deprecated
 - `GET    /autoload/v2/reports/{report_id}` — Статистика по конкретной выгрузке (deprecated) ⚠️ deprecated
-- `GET    /autoload/v2/reports/{report_id}/items` — Все объявления из конкретной выгрузки
-- `GET    /autoload/v2/reports/{report_id}/items/fees` — Списания за объявления в конкретной выгрузке
-- `GET    /autoload/v3/reports/last_completed_report` — Статистика по последней выгрузке
-- `GET    /autoload/v3/reports/{report_id}` — Статистика по конкретной выгрузке
+- `GET    /autoload/v2/reports/{report_id}/items` — Все объявления из конкретной выгрузки (deprecated) ⚠️ deprecated
+- `GET    /autoload/v2/reports/{report_id}/items/fees` — Списания за объявления в конкретной выгрузке (deprecated) ⚠️ deprecated
+- `GET    /autoload/v3/reports/last_completed_report` — Статистика по последней выгрузке (deprecated) ⚠️ deprecated
+- `GET    /autoload/v3/reports/{report_id}` — Статистика по конкретной выгрузке (deprecated) ⚠️ deprecated
+- `GET    /autoload/v4/uploads` — История загрузок
+- `GET    /autoload/v4/uploads/current` — Текущая загрузка
+- `GET    /autoload/v4/uploads/current/items` — Объявления текущей загрузки
+- `GET    /autoload/v4/uploads/last_successful` — Последняя успешно завершённая загрузка
+- `GET    /autoload/v4/uploads/last_successful/items` — Объявления последней успешно завершённой загрузки
 
 ## Мессенджер (13) — [docs](./sections/messenger.md)
 
@@ -189,6 +221,16 @@
 - `POST   /autostrategy/v1/campaigns` — Получение списка кампаний
 - `POST   /autostrategy/v1/stat` — Получение статистики по кампании
 
+## Иерархия Аккаунтов (7) — [docs](./sections/accounts-hierarchy.md)
+
+- `GET    /checkAhUserV1` — Получение информации о статусе пользователя в ИА ⚠️ deprecated
+- `GET    /checkAhUserV2` — Получение информации о статусе пользователя в ИА
+- `GET    /getAhInfoV1` — Получение полной информации о статусе пользователя в ИА
+- `GET    /getEmployeesV1` — Получение списка сотрудников иерархии
+- `POST   /linkItemsV1` — Прикрепление сотрудника иерархии к объявлениям, перезакрепление объявлений между сотруд…
+- `GET    /listCompanyPhonesV1` — Получение списка телефонов компании
+- `POST   /listItemsByEmployeeIdV1` — Получение списка объявлений по сотруднику
+
 ## Продвижение (7) — [docs](./sections/promotion.md)
 
 - `POST   /promotion/v1/items/services/bbip/forecasts/get` — BBIP. Прогноз продвижения
@@ -198,14 +240,6 @@
 - `POST   /promotion/v1/items/services/get` — Список услуг продвижения
 - `POST   /promotion/v1/items/services/orders/get` — Список заявок
 - `POST   /promotion/v1/items/services/orders/status` — Статус заявки
-
-## Иерархия Аккаунтов (5) — [docs](./sections/accounts-hierarchy.md)
-
-- `GET    /checkAhUserV1` — Получение информации о статусе пользователя в ИА
-- `GET    /getEmployeesV1` — Получение списка сотрудников иерархии
-- `POST   /linkItemsV1` — Прикрепление сотрудника иерархии к объявлениям, перезакрепление объявлений между сотруд…
-- `GET    /listCompanyPhonesV1` — Получение списка телефонов компании
-- `POST   /listItemsByEmployeeIdV1` — Получение списка объявлений по сотруднику
 
 ## Краткосрочная аренда (5) — [docs](./sections/str.md)
 

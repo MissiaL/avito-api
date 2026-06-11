@@ -1,13 +1,13 @@
 ---
 name: avito-api
-description: Use whenever the user wants to interact with Avito (avito.ru) for business — managing listings, replying to messenger chats, working with delivery/orders, vacancies/CVs (Авито.Работа), Autoload, Автотека reports, call tracking, tariffs, CPA, statistics, promotion (продвижение объявлений), realty analytics, ratings, short-term rent, or any other Avito Business API endpoint. Trigger on phrases like "Avito API", "авито апи", "объявления на авито", "чаты авито", "Автозагрузка", "Авито Работа", "Автотека", "продвижение на авито", "calltracking авито", or any URL under api.avito.ru. The skill bundles the full OpenAPI 3.0 spec from the official catalog (197 endpoints, 23 sections), per-section integration docs, an OAuth2 token helper, and a lookup tool — use it instead of guessing paths or schemas, even for endpoints that look obvious.
+description: Use whenever the user wants to interact with Avito (avito.ru) for business — managing listings, replying to messenger chats, working with delivery/orders, vacancies/CVs (Авито.Работа), Autoload, Автотека reports, call tracking, tariffs, CPA, statistics, promotion (продвижение объявлений), Avito Ads (Авито Реклама), realty analytics, ratings, short-term rent, or any other Avito Business API endpoint. Trigger on phrases like "Avito API", "авито апи", "объявления на авито", "чаты авито", "Автозагрузка", "Авито Работа", "Автотека", "продвижение на авито", "Авито Реклама", "calltracking авито", or any URL under api.avito.ru. The skill bundles the full OpenAPI 3.0 spec from the official catalog (227 endpoints, 24 sections), per-section integration docs, an OAuth2 token helper, and a lookup tool — use it instead of guessing paths or schemas, even for endpoints that look obvious.
 ---
 
 # Avito Business API
 
-This skill helps you call the Avito Business API (`https://api.avito.ru`). It bundles the full OpenAPI 3.0 spec built from the **official developer catalog** (`developers.avito.ru/api-catalog`) — 197 paths / 203 operations across 23 sections — plus the per-section integration docs Avito publishes alongside.
+This skill helps you call the Avito Business API (`https://api.avito.ru`). It bundles the full OpenAPI 3.0 spec built from the **official developer catalog** (`developers.avito.ru/api-catalog`) — 227 paths / 234 operations across 24 sections — plus the per-section integration docs Avito publishes alongside.
 
-The spec is large (~1.7 MB). Don't read it whole — use the helpers described below to pull only what you need.
+The spec is large (~2.0 MB). Don't read it whole — use the helpers described below to pull only what you need.
 
 ## Authentication — OAuth2 Client Credentials
 
@@ -64,7 +64,7 @@ For a category overview, browse [references/index.md](references/index.md) — a
 
 **Per-section integration docs.** Every section also has a markdown doc in `references/sections/<slug>.md` — these are the official Avito integration guides (sandbox setup, examples, edge cases, scope details) and they're often more useful than the OpenAPI spec for non-trivial flows. Available slugs (load on demand):
 
-`accounts-hierarchy`, `auction`, `auth`, `autoload`, `autostrategy`, `autoteka`, `calltracking`, `cpa`, `cpxpromo`, `delivery-sandbox`, `item`, `job`, `messenger`, `order-management`, `promotion`, `ratings`, `sbc-gateway`, `stock-management`, `str`, `tariff`, `trxpromo`, `user`.
+`accounts-hierarchy`, `ads`, `auction`, `auth`, `autoload`, `autostrategy`, `autoteka`, `calltracking`, `cpa`, `cpxpromo`, `delivery-sandbox`, `item`, `job`, `messenger`, `order-management`, `promotion`, `ratings`, `sbc-gateway`, `stock-management`, `str`, `tariff`, `trxpromo`, `user`.
 
 **Why this matters:** the spec has many similar-looking paths (`/messenger/v1/...` vs `/messenger/v2/...`, ru/en duplicate tags, deprecated endpoints with newer replacements). Guessing leads to 404s, wrong schemas, or calling deprecated paths. Always look up before composing a request.
 
@@ -129,32 +129,33 @@ When you report an error to the user, include the HTTP code and the full body �
 
 ## Sections at a glance
 
-23 sections, sorted by endpoint count. Full list with paths is in [references/index.md](references/index.md).
+24 sections, sorted by endpoint count. Full list with paths is in [references/index.md](references/index.md).
 
 | Section | # | Notes |
 |---|---:|---|
 | Доставка | 31 | Avito Доставка integration: parcel processing, tariffs, sandbox. Has detailed sandbox docs in `sections/delivery-sandbox.md`. |
 | Автотека | 27 | Paid car history reports. |
-| Авито.Работа | 22 | Vacancies, applications, resumes, webhooks. Mix of v1 and v2 — prefer v2. |
-| Автозагрузка | 15 | Bulk listing upload via XML/JSON feeds, reports. v1 endpoints are deprecated, prefer v2. |
+| Авито.Работа | 25 | Vacancies, applications, resumes, webhooks. Mix of v1 and v2 — prefer v2. |
+| Авито Реклама | 24 | Ads cabinet API (`/ads/v1/...`): accounts, advertisers, contracts, campaigns/groups/creatives stats, budgets. Own `client_id`/`client_secret` from the Авито Реклама cabinet (per ad account). Sandbox at `/ads-sandbox/`. See `sections/ads.md`. |
+| Автозагрузка | 22 | Bulk listing upload via XML/JSON feeds. v1 and all `reports` endpoints (v2/v3) are deprecated — upload status now lives at `/autoload/v4/uploads/...`. |
 | Мессенджер | 13 | Chats and messages. v1 and v2 both exist; v2 is the current one for reads. Sending text messages is still `POST /messenger/v1/.../messages`. |
 | Управление заказами | 12 | Order lifecycle for marketplace sellers, including label generation. |
 | CPA Авито | 11 | Performance-billing actions, complaints, chats by time. |
 | Объявления | 11 | Item CRUD-ish: list, view, status, edit price, deactivate. |
 | Автостратегия | 7 | Auto-bidding strategies. |
+| Иерархия Аккаунтов | 7 | Multi-account / agency setups. Employee calls on behalf of a company need the `X-Employee-Of` header (`X-Is-Employee` is deprecated). Prefer `checkAhUserV2` + `getAhInfoV1`. |
 | Продвижение | 7 | Paid promotion services and BBIP (bbip = повышенный показ). |
-| Иерархия Аккаунтов | 5 | Multi-account / agency setups. |
 | Настройка цены целевого действия | 5 | CPA price tuning (`cpxpromo`). |
 | Краткосрочная аренда | 5 | STR (short-term rent). |
 | Рассылка скидок и спецпредложений в мессенджере (beta) | 5 | `sbc-gateway`. |
 | Рейтинги и отзывы | 4 | |
-| Авторизация | 3 | Token issue/refresh. |
 | CallTracking[КТ] | 3 | Strict 5 rpm limit. Audio recordings ~30 min after call ends. |
 | TrxPromo | 3 | Promo transactions. |
 | Информация о пользователе | 3 | `GET /core/v1/accounts/self`, etc. |
+| CPA-аукцион | 2 | |
+| Авторизация | 2 | Token issue/refresh. |
 | Аналитика по недвижимости | 2 | Realty market price reports. |
 | Управление остатками | 2 | Read + bulk update stock quantities. |
-| CPA-аукцион | 1 | |
 | Тарифы | 1 | Current + scheduled tariff info. **Транспорт only, non-CPA.** |
 
 For non-trivial flows (delivery sandbox, scope/auth setup, vacancies v2), open the matching `references/sections/<slug>.md` first — those docs cover prerequisites and gotchas the OpenAPI spec doesn't.
