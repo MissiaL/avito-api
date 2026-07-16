@@ -39,34 +39,34 @@
    * описание приложения — расскажите пользователям, для чего
    нужно ваше приложение и как оно работает;
 2. Отправьте пользователю ссылку вида
-[https://avito.ru/oauth?response_type=code&amp;pro_users_flow=true&amp;client_id=](https://avito.ru/oauth?response_type=code&amp;pro_users_flow=true&amp;client_id=)&lt;CLIENT_ID&gt;&amp;scope=messenger:
-read,messenger:write — по ней он получит доступ к вашему приложению.
 
-Обратите внимание: в query параметрах указаны скоупы, доступ к которым должен
-будет одобрить пользователь. Запрашивать нужно те скоупы, которые действительно
-нужны для работы вашего приложения. Полный список доступных скоупов
-представлен ниже:
-* autoload:reports - Получение отчетов Автозагрузки
-* items:apply_vas - Применение дополнительных услуг
-* items:info - Получение информации об объявлениях
-* job:cv - Получение информации резюме
-* job:applications - Получение информации об откликах на вакансии
-* job:vacancy - Работа с вакансиями
-* job:write - Изменение объявлений вертикали Работа
-* messenger:read - Чтение сообщений в мессенджере Авито
-* messenger:write - Модифицирование сообщений в мессенджере Авито
-* short_term_rent:read - Получение информации об объявлениях краткосрочной аренды
-* short_term_rent:write - Изменение объявлений краткосрочной аренды
-* stats:read - Получение статистики объявлений
-* user:read - Получение информации о пользователе
-* user_balance:read - Получение баланса пользователя
-* user_operations:read - Получение истории операций пользователя
+    [https://avito.ru/oauth?response_type=code&amp;pro_users_flow=true&amp;client_id=](https://avito.ru/oauth?response_type=code&amp;pro_users_flow=true&amp;client_id=)&lt;CLIENT_ID&gt;&amp;scope=messenger:read,messenger:write — по ней он получит доступ к вашему приложению.
 
-После одобрения пользователем доступа для приложения Авито перенаправит
-пользовательский агент (браузер) по Redirect URI, указанному при регистрации. Адрес
-в этом случае будет обогащён кодом авторизации в виде параметра code. Например,
-для Redirect URI [https://example.com/callback/avito](https://example.com/callback/avito) ссылка будет выглядеть следующим
-образом: [https://example.com/callback/avito?code=](https://example.com/callback/avito?code=)&lt;AUTHORIZATION_CODE&gt;
+    Обратите внимание: в query параметрах указаны скоупы, доступ к которым должен
+    будет одобрить пользователь. Запрашивать нужно те скоупы, которые действительно
+    нужны для работы вашего приложения. Полный список доступных скоупов
+    представлен ниже:
+    * autoload:reports - Получение отчетов Автозагрузки
+    * items:apply_vas - Применение дополнительных услуг
+    * items:info - Получение информации об объявлениях
+    * job:cv - Получение информации резюме
+    * job:applications - Получение информации об откликах на вакансии
+    * job:vacancy - Работа с вакансиями
+    * job:write - Изменение объявлений вертикали Работа
+    * messenger:read - Чтение сообщений в мессенджере Авито
+    * messenger:write - Модифицирование сообщений в мессенджере Авито
+    * short_term_rent:read - Получение информации об объявлениях краткосрочной аренды
+    * short_term_rent:write - Изменение объявлений краткосрочной аренды
+    * stats:read - Получение статистики объявлений
+    * user:read - Получение информации о пользователе
+    * user_balance:read - Получение баланса пользователя
+    * user_operations:read - Получение истории операций пользователя
+
+    После одобрения пользователем доступа для приложения Авито перенаправит
+    пользовательский агент (браузер) по Redirect URI, указанному при регистрации. Адрес
+    в этом случае будет обогащён кодом авторизации в виде параметра code. Например,
+    для Redirect URI [https://example.com/callback/avito](https://example.com/callback/avito) ссылка будет выглядеть следующим
+    образом: [https://example.com/callback/avito?code=](https://example.com/callback/avito?code=)&lt;AUTHORIZATION_CODE&gt;
 
 3. Чтобы получить доступ, выполните запрос к методу token со следующими
 данными:

@@ -3,7 +3,7 @@
   "info": {
     "title": "Avito API для бизнеса (официальный каталог)",
     "version": "1.0.0",
-    "description": "Полный спек Avito Business API, собранный из официального каталога developers.avito.ru/api-catalog. Каждая операция получила тег с русским названием раздела и поле x-avito-section для удобной навигации.",
+    "description": "Полный спек Avito Business API, собранный из официального каталога developers.avito.ru/api-catalog. Каждая операция получила тег с русским названием раздела и поле x-avito-section для удобной навигации. При коллизиях path+method между разделами канонический вариант — last-write-wins по sorted(slug); проигравшие разделы указаны в x-avito-also-in.",
     "contact": {
       "email": "supportautoload@avito.ru"
     },
@@ -1177,6 +1177,24 @@
               }
             },
             "description": "Ok",
+            "headers": {
+              "Api-Point-Balance": {
+                "description": "Остаток API-баллов после выполнения запроса",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "207": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1CreateAccountOut"
+                }
+              }
+            },
+            "description": "Аккаунт создан, но часть sandbox-данных не подготовилась",
             "headers": {
               "Api-Point-Balance": {
                 "description": "Остаток API-баллов после выполнения запроса",
@@ -4481,7 +4499,15 @@
         "summary": "Получение access token\n",
         "tags": [
           "Authorization",
-          "Автотека"
+          "Автотека",
+          "Access",
+          "Авторизация"
+        ],
+        "x-avito-also-in": [
+          {
+            "slug": "auth",
+            "title": "Авторизация"
+          }
         ],
         "x-avito-section": {
           "slug": "autoteka",
@@ -8868,6 +8894,14 @@
           "slug": "autoteka",
           "title": "Автотека"
         }
+      },
+      "x-gateway": {
+        "timeouts": {
+          "connect": "200ms",
+          "envoy": "5.0s",
+          "read": "5s",
+          "send": "5s"
+        }
       }
     },
     "/autoteka/v1/scoring/by-vehicle-id": {
@@ -9179,6 +9213,14 @@
           "slug": "autoteka",
           "title": "Автотека"
         }
+      },
+      "x-gateway": {
+        "timeouts": {
+          "connect": "200ms",
+          "envoy": "5.0s",
+          "read": "5s",
+          "send": "5s"
+        }
       }
     },
     "/autoteka/v1/specifications/by-vehicle-id": {
@@ -9267,6 +9309,14 @@
         "x-avito-section": {
           "slug": "autoteka",
           "title": "Автотека"
+        }
+      },
+      "x-gateway": {
+        "timeouts": {
+          "connect": "200ms",
+          "envoy": "5.0s",
+          "read": "5s",
+          "send": "5s"
         }
       }
     },
@@ -9821,6 +9871,1522 @@
           "slug": "autoteka",
           "title": "Автотека"
         }
+      },
+      "x-gateway": {
+        "timeouts": {
+          "connect": "200ms",
+          "envoy": "5.0s",
+          "read": "5s",
+          "send": "5s"
+        }
+      }
+    },
+    "/agency/balance": {
+      "post": {
+        "description": "Данный метод выполняет перевод средств агентства на счёт клиента (актуально для рекламной модели).\nПри пополнении счёта клиента должны совпадать ИНН и КПП для:\n\n- аккаунта, от имени которого выполняется запрос;\n- аккаунта, на чей счёт нужно перевести средства;\n- платежа, из которого берётся указанная сумма.\n\n### Параметры тела запроса\n\n- `userId` — идентификатор клиента, на счёт которого переводятся средства.\n- `amount` — сумма перевода в рублях.\n\n### Успешный ответ\n\nМетод возвращает назад информацию о созданной транзакции:\n\n- `result.transactionId` — идентификатор транзакции,\n  с помощью которого можно получить информацию о транзакции\n  (см. метод [Получение информации о транзакции](#operation/agencyTransaction)).\n- `result.status` — статус транзакции.\n- `result.reason` — причина текущего статуса транзакции.\n\nВ случае успеха статус будет иметь значение `processing` — транзакция в процессе обработки.\nЕсли же при создании транзакции возникает ошибка, то статус будет иметь значение `error`.\nВ таком случае необходимо обратиться в службу поддержки,\n  указав в обращении в том числе значение параметра `result.reason`.\n",
+        "operationId": "agencyBalance",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/authHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "amount": {
+                    "description": "Сумма в рублях",
+                    "example": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "userId": {
+                    "$ref": "#/components/schemas/id"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "amount"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "result": {
+                      "additionalProperties": false,
+                      "description": "Результат перевода средств на счёт клиента",
+                      "properties": {
+                        "reason": {
+                          "description": "Причина текущего статуса транзакции",
+                          "example": "Создан запрос на перевод средств",
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "Статус транзакции",
+                          "enum": [
+                            "processing",
+                            "error"
+                          ],
+                          "example": "processing",
+                          "type": "string"
+                        },
+                        "transactionId": {
+                          "$ref": "#/components/schemas/transactionId"
+                        }
+                      },
+                      "required": [
+                        "transactionId",
+                        "status",
+                        "reason"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "result"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Успешный ответ"
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequestFields"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/defaultTooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/defaultInternalServerError"
+          }
+        },
+        "security": [
+          {
+            "ClientCredentials": []
+          }
+        ],
+        "summary": "Перевод средств на счёт клиента",
+        "tags": [
+          "transactions",
+          "Авито Promo"
+        ],
+        "x-avito-section": {
+          "slug": "avito-promo",
+          "title": "Авито Promo"
+        }
+      }
+    },
+    "/agency/transactions": {
+      "get": {
+        "description": "Данный метод позволяет получить список незавершённых транзакций.\n\n### Успешный ответ\n\nМетод возвращает назад массив незавершённых транзакций `result`.\n\n#### Транзакция\n\nВ данных транзакции возвращается её идентификатор `transactionId` и статус `status`.\nПо идентификатору транзакции с помощью метода\n  [Получение информации о транзакции](#operation/agencyTransaction) можно получить сообщение об ошибке,\n  если её статус имеет значение `error`.\n\n#### Статус транзакции\n\n- `success` — перевод средств успешно завершён.\n- `processing` — транзакция создана, но её обработка ещё не завершена.\n- `error` — при обработке транзакции произошла ошибка.\n",
+        "operationId": "agencyTransactions",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/authHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "result": {
+                      "description": "Информация о незавершённых транзакциях",
+                      "items": {
+                        "additionalProperties": false,
+                        "description": "Информация о транзакции",
+                        "properties": {
+                          "status": {
+                            "$ref": "#/components/schemas/transactionStatus"
+                          },
+                          "transactionId": {
+                            "$ref": "#/components/schemas/transactionId"
+                          }
+                        },
+                        "required": [
+                          "transactionId",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "result"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Успешный ответ"
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequestFields"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/defaultTooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/defaultInternalServerError"
+          }
+        },
+        "security": [
+          {
+            "ClientCredentials": []
+          }
+        ],
+        "summary": "Получение списка незавершённых транзакций",
+        "tags": [
+          "transactions",
+          "Авито Promo"
+        ],
+        "x-avito-section": {
+          "slug": "avito-promo",
+          "title": "Авито Promo"
+        }
+      }
+    },
+    "/agency/transactions/{transaction_id}": {
+      "get": {
+        "description": "Данный метод позволяет получить информацию о транзакции.\n\n### Параметры тела запроса\n\n- `transactionId` — идентификатор транзакции\n  (см. метод [Перевод средств на счёт клиента](#operation/agencyBalance)).\n\n### Успешный ответ\n\nМетод возвращает назад идентификатор транзакции `result.transactionId` и её статус `result.status`.\nЕсли статус имеет значение `error`, то также возвращается сообщение об ошибке `result.message`.\n\n#### Статус транзакции\n\n- `success` — перевод средств успешно завершён.\n- `processing` — транзакция создана, но её обработка ещё не завершена.\n- `error` — при обработке транзакции произошла ошибка.\n\n#### Сообщение об ошибке\n\n- «transfer not found» — транзакция с заданным `transactionId` не найдена.\n- «Недостаточно средств у рекламного агентства» — транзакцию не удалось выполнить из-за того,\n  что все предварительно внесённые средства исчерпаны.\n- любой другой текст — внутренняя ошибка. Следует обратиться в службу поддержки.\n",
+        "operationId": "agencyTransaction",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/transactionIdPathParameter"
+          },
+          {
+            "$ref": "#/components/parameters/authHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "result": {
+                      "additionalProperties": false,
+                      "description": "Информация о транзакции",
+                      "properties": {
+                        "message": {
+                          "$ref": "#/components/schemas/errorMessage"
+                        },
+                        "status": {
+                          "$ref": "#/components/schemas/transactionStatus"
+                        },
+                        "transactionId": {
+                          "$ref": "#/components/schemas/transactionId"
+                        }
+                      },
+                      "required": [
+                        "transactionId",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "result"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Успешный ответ"
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequestFields"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/defaultTooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/defaultInternalServerError"
+          }
+        },
+        "security": [
+          {
+            "ClientCredentials": []
+          }
+        ],
+        "summary": "Получение информации о транзакции",
+        "tags": [
+          "transactions",
+          "Авито Promo"
+        ],
+        "x-avito-section": {
+          "slug": "avito-promo",
+          "title": "Авито Promo"
+        }
+      }
+    },
+    "/api/1/agency/clients": {
+      "post": {
+        "description": "Данный метод позволяет получить список клиентов агентства с дополнительной информацией о них.\n\n### Параметры тела запроса\n\n- `limit` — инструмент пагинации, ограничивает количество клиентов в ответе (максимум 100).\n- `offset` — инструмент пагинации, выполняет смещение, с которого начинается выборка клиентов (по умолчанию 0).\n- `extra` — настройка дополнительной информации, если нужно включить её в ответ.\n\n#### Дополнительная информация о клиентах\n\nМожно включить в список клиентов дополнительную информацию о них,\n  установив в `true` необходимые опции `extra`:\n\n- `balance` — текущий баланс Кошелька клиента.\n- `subscription` — текущая подписка клиента.\n- `advance` — остаток аванса тарифа клиента, если есть.\n- `statistics` — статистика клиента (расходы, количество объявлений, просмотров и контактов).\n\n### Успешный ответ\n\nМетод возвращает назад список клиентов `result.clients` и общее количество клиентов агентства `result.total`.\n\n#### Клиент\n\n- `clientId` — идентификатор аккаунта клиента, прикреплённого к агентству.\n- `mainUserId` — идентификатор принявшего приглашение клиента\n  (возвращается только для связи по рекламной модели).\n- `name` — наименование клиента.\n- `status` — статус клиента: `active` — активный, `new` — новый клиент, ещё не принял приглашение агентства.\n- `linkType` — тип связи клиента с агентством: `adv` — по рекламной, `trx` — по транзакционной модели.\n- `linkTime` — время прикрепления клиента к агентству в формате RFC3339.\n\nЕсли был запрошен текущий баланс Кошелька клиента,\n  то также возвращается сумма баланса `balance.amount` в копейках.\n\nЕсли была запрошена текущая подписка клиента,\n  то также возвращается информация `subscription` со следующими данными:\n\n- `category` — категория подписки клиента.\n- `level` — уровень подписки клиента.\n- `isActive` — активна (оплачена) ли подписка клиента.\n- `expiredTo` — к какому времени закончится текущий период активной подписки клиента.\n\nЕсли был запрошен остаток аванса тарифа клиента,\n  то также возвращается сумма аванса `advance.amount` в копейках.\n\nЕсли была запрошена статистика клиента, то также возвращается информация `statistics` со следующими данными:\n\n- `spendings` — сумма расходов клиента в копейках.\n- `activeItems` — количество объявлений клиента.\n- `views` — количество просмотров объявлений клиента.\n- `clicks` — количество контактов клиента.\n\n#### Категория подписки\n\n- `auto` — Транспорт.\n- `realty` — Недвижимость.\n- `job` — Работа.\n- `services` — Услуги.\n- `goods` — Товары.\n\n#### Уровень подписки\n\n- `basic` — базовая подписка.\n- `extended` — расширенная подписка.\n- `maximal` — максимальная подписка.\n- `ultra` — ультра-подписка.\n",
+        "operationId": "agencyClients",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/authHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "extra": {
+                    "additionalProperties": false,
+                    "description": "Настройка дополнительной информации о клиентах",
+                    "properties": {
+                      "advance": {
+                        "$ref": "#/components/schemas/toggle"
+                      },
+                      "balance": {
+                        "$ref": "#/components/schemas/toggle"
+                      },
+                      "statistics": {
+                        "$ref": "#/components/schemas/toggle"
+                      },
+                      "subscription": {
+                        "$ref": "#/components/schemas/toggle"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "limit": {
+                    "description": "Ограничение количества сущностей в выборке",
+                    "example": 100,
+                    "maximum": 100,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "offset": {
+                    "$ref": "#/components/schemas/offset"
+                  }
+                },
+                "required": [
+                  "limit"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "result": {
+                      "additionalProperties": false,
+                      "description": "Информация о клиентах",
+                      "properties": {
+                        "clients": {
+                          "description": "Список клиентов",
+                          "items": {
+                            "additionalProperties": false,
+                            "description": "Информация о клиенте",
+                            "properties": {
+                              "advance": {
+                                "additionalProperties": false,
+                                "description": "Информация о балансе аванса тарифа клиента",
+                                "properties": {
+                                  "amount": {
+                                    "$ref": "#/components/schemas/amountKopecks"
+                                  }
+                                },
+                                "required": [
+                                  "amount"
+                                ],
+                                "type": "object"
+                              },
+                              "balance": {
+                                "additionalProperties": false,
+                                "description": "Информация о балансе Кошелька клиента",
+                                "properties": {
+                                  "amount": {
+                                    "$ref": "#/components/schemas/amountKopecks"
+                                  }
+                                },
+                                "required": [
+                                  "amount"
+                                ],
+                                "type": "object"
+                              },
+                              "clientId": {
+                                "$ref": "#/components/schemas/id"
+                              },
+                              "linkTime": {
+                                "$ref": "#/components/schemas/dateTime"
+                              },
+                              "linkType": {
+                                "$ref": "#/components/schemas/linkType"
+                              },
+                              "mainUserId": {
+                                "$ref": "#/components/schemas/id"
+                              },
+                              "name": {
+                                "description": "Наименование клиента",
+                                "example": "Клиент",
+                                "type": "string"
+                              },
+                              "statistics": {
+                                "additionalProperties": false,
+                                "description": "Статистика клиента",
+                                "properties": {
+                                  "activeItems": {
+                                    "$ref": "#/components/schemas/counter"
+                                  },
+                                  "clicks": {
+                                    "$ref": "#/components/schemas/counter"
+                                  },
+                                  "spendings": {
+                                    "$ref": "#/components/schemas/amountKopecks"
+                                  },
+                                  "views": {
+                                    "$ref": "#/components/schemas/counter"
+                                  }
+                                },
+                                "required": [
+                                  "activeItems",
+                                  "spendings",
+                                  "views",
+                                  "clicks"
+                                ],
+                                "type": "object"
+                              },
+                              "status": {
+                                "description": "Статус клиента",
+                                "enum": [
+                                  "new",
+                                  "active"
+                                ],
+                                "example": "active",
+                                "type": "string"
+                              },
+                              "subscription": {
+                                "additionalProperties": false,
+                                "description": "Информация о подписке клиента",
+                                "properties": {
+                                  "category": {
+                                    "description": "Категория подписки клиента",
+                                    "enum": [
+                                      "auto",
+                                      "realty",
+                                      "services",
+                                      "job",
+                                      "goods"
+                                    ],
+                                    "example": "goods",
+                                    "type": "string"
+                                  },
+                                  "expiredTo": {
+                                    "$ref": "#/components/schemas/dateTime"
+                                  },
+                                  "isActive": {
+                                    "$ref": "#/components/schemas/toggle"
+                                  },
+                                  "level": {
+                                    "description": "Уровень подписки клиента",
+                                    "enum": [
+                                      "basic",
+                                      "extended",
+                                      "maximal",
+                                      "ultra"
+                                    ],
+                                    "example": "maximal",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "category",
+                                  "level",
+                                  "isActive"
+                                ],
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "clientId",
+                              "name",
+                              "status",
+                              "linkType",
+                              "linkTime"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "total": {
+                          "$ref": "#/components/schemas/counter"
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "clients"
+                      ],
+                      "type": "object"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/okResponseStatus"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "result"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Успешный ответ"
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequestFieldsWithStatus"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorizedWithStatus"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbiddenWithStatus"
+          },
+          "429": {
+            "$ref": "#/components/responses/defaultTooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/defaultInternalServerError"
+          }
+        },
+        "security": [
+          {
+            "ClientCredentials": []
+          }
+        ],
+        "summary": "Получение списка клиентов",
+        "tags": [
+          "profile",
+          "Авито Promo"
+        ],
+        "x-avito-section": {
+          "slug": "avito-promo",
+          "title": "Авито Promo"
+        }
+      }
+    },
+    "/api/1/agency/clients/target/create": {
+      "post": {
+        "description": "Данный метод запускает задачу на проверку ИНН клиентов.\n\n### Параметры запроса\n\n- `innList` — не пустой список до 100 ИНН.\n\n### Успешный ответ\n\nМетод возвращает назад идентификатор задачи `result.taskId`,\n  с помощью которого можно будет получить её статус и результаты проверки\n  (см. метод [Получение результата проверки ИНН клиентов](#operation/agencyClientsTargetResult)).\n",
+        "operationId": "agencyClientsTargetCreate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/authHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "innList": {
+                    "description": "Список ИНН",
+                    "items": {
+                      "$ref": "#/components/schemas/inn"
+                    },
+                    "maxItems": 100,
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "innList"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/targetTaskId"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/okResponseStatus"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "result"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Успешный ответ"
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequestFieldsWithStatus"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorizedWithStatus"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbiddenWithStatus"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundWithStatus"
+          },
+          "429": {
+            "$ref": "#/components/responses/defaultTooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/defaultInternalServerError"
+          }
+        },
+        "security": [
+          {
+            "ClientCredentials": []
+          }
+        ],
+        "summary": "Создание задачи на проверку ИНН клиентов",
+        "tags": [
+          "targeting",
+          "Авито Promo"
+        ],
+        "x-avito-section": {
+          "slug": "avito-promo",
+          "title": "Авито Promo"
+        }
+      }
+    },
+    "/api/1/agency/clients/target/result": {
+      "post": {
+        "description": "Данный метод позволяет получить по идентификатору статус задачи проверки ИНН клиентов,\n  а также результаты этой проверки, если задача завершилась успешно.\n\n### Параметры тела запроса\n\n- `taskId` — идентификатор задачи\n  (см. метод [Создание задачи на проверку ИНН клиентов](#operation/agencyClientsTargetCreate)).\n\n### Успешный ответ\n\nМетод возвращает назад статус задачи `result.status` и итог проверки `result.items`,\n  если задача успешно завершена.\n\n#### Статус задачи\n\n- `pending` — задача ещё в процессе выполнения.\n- `success` — задача успешно завершена.\n\n#### Итог проверки\n\nИтог проверки представлен массивом результатов по каждому из исходного списка ИНН:\n\n- `inn` — проверенный ИНН.\n- `isError` — была ли ошибка при проверке.\n  Если да, то результат проверки такого ИНН следует игнорировать.\n- `results` — результаты проверки ИНН по категориям.\n\nРезультаты представлены массивом статусов в категориях:\n\n- `category` — категория.\n- `status` — статус ИНН в категории.\n\n#### Категория\n\n- `goods` — Товары.\n- `services` —Услуги.\n- `machinery` — Спецтехника.\n- `jobs` — Работа.\n\n#### Статус ИНН\n\n- `new` — «Новый»: клиент,\n  у которого были нулевые или незначительные траты на Авито до подключения к агентству.\n- `uplift` — «Аплифт»: клиент, который уже пользовался платными услугами до подключения к агентству,\n  комиссия может начисляться только с роста его расходов на услуги размещения.\n- `unavailable` — «Недоступен»: клиент недоступен для работы с агентствами в данной категории.\n  Для подключения клиента в других категориях свяжитесь с менеджером.\n",
+        "operationId": "agencyClientsTargetResult",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/authHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/targetTaskId"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "result": {
+                      "additionalProperties": false,
+                      "description": "Информация о проверке ИНН клиентов",
+                      "properties": {
+                        "items": {
+                          "description": "Список результатов проверки ИНН клиентов",
+                          "items": {
+                            "additionalProperties": false,
+                            "description": "Результат проверки ИНН клиента",
+                            "properties": {
+                              "inn": {
+                                "$ref": "#/components/schemas/inn"
+                              },
+                              "isError": {
+                                "description": "Наличие ошибки при проверке ИНН клиента",
+                                "example": false,
+                                "type": "boolean"
+                              },
+                              "results": {
+                                "description": "Результаты проверки ИНН клиента по категориям",
+                                "items": {
+                                  "additionalProperties": false,
+                                  "description": "Результат проверки ИНН клиента в категории",
+                                  "properties": {
+                                    "category": {
+                                      "description": "Категория",
+                                      "enum": [
+                                        "goods",
+                                        "services",
+                                        "machinery",
+                                        "jobs"
+                                      ],
+                                      "example": "goods",
+                                      "type": "string"
+                                    },
+                                    "status": {
+                                      "description": "Статус ИНН клиента в категории",
+                                      "enum": [
+                                        "new",
+                                        "uplift",
+                                        "unavailable"
+                                      ],
+                                      "example": "new",
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "category",
+                                    "status"
+                                  ],
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              }
+                            },
+                            "required": [
+                              "inn",
+                              "isError",
+                              "results"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "status": {
+                          "description": "Статус задачи проверки ИНН клиентов",
+                          "enum": [
+                            "pending",
+                            "success"
+                          ],
+                          "example": "success",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "items"
+                      ],
+                      "type": "object"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/okResponseStatus"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "result"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Успешный ответ"
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequestFieldsWithStatus"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorizedWithStatus"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbiddenWithStatus"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundWithStatus"
+          },
+          "429": {
+            "$ref": "#/components/responses/defaultTooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/defaultInternalServerError"
+          }
+        },
+        "security": [
+          {
+            "ClientCredentials": []
+          }
+        ],
+        "summary": "Получение результата проверки ИНН клиентов",
+        "tags": [
+          "targeting",
+          "Авито Promo"
+        ],
+        "x-avito-section": {
+          "slug": "avito-promo",
+          "title": "Авито Promo"
+        }
+      }
+    },
+    "/api/1/agency/finances/balance": {
+      "get": {
+        "description": "Данный метод позволяет получить текущий баланс средств агентства.\n\n### Успешный ответ\n\nМетод возвращает назад информацию о балансе агентства `result`:\n\n- `full` — сумма полного баланса средств агентства в копейках.\n- `pending` — сумма баланса средств агентства, находящихся «в обработке», в копейках.\n",
+        "operationId": "agencyFinancesBalance",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/authHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "full": {
+                      "$ref": "#/components/schemas/amountKopecks"
+                    },
+                    "pending": {
+                      "$ref": "#/components/schemas/amountKopecks"
+                    }
+                  },
+                  "required": [
+                    "full",
+                    "pending"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Успешный ответ"
+          },
+          "400": {
+            "$ref": "#/components/responses/defaultBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/defaultUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/defaultForbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/defaultTooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/defaultInternalServerError"
+          }
+        },
+        "security": [
+          {
+            "ClientCredentials": []
+          }
+        ],
+        "summary": "Получение баланса агентства",
+        "tags": [
+          "balance",
+          "Авито Promo"
+        ],
+        "x-avito-section": {
+          "slug": "avito-promo",
+          "title": "Авито Promo"
+        }
+      }
+    },
+    "/api/1/agency/finances/transactionsHistory": {
+      "post": {
+        "description": "Данный метод позволяет получить список всех операций с балансом средств агентства.\n\n### Параметры тела запроса\n\n- `dateFrom` — дата в формате RFC3339, с которой требуется получить операции с балансом.\n- `dateTo` — дата в формате RFC3339, по которую требуется получить операции с балансом.\n- `limit` — инструмент пагинации, ограничивает количество операций в ответе (максимум 1000).\n- `offset` — инструмент пагинации, выполняет смещение, с которого начинается выборка операций.\n\n### Успешный ответ\n\nМетод возвращает назад список транзакций `result.items` — операции с балансом средств агентства.\n\n#### Транзакция\n\nТранзакция содержит в себе следующую информацию:\n\n- `transactionId` — идентификатор транзакции.\n- `operationDateTime` — дата и время проведения транзакции.\n- `amount` — сумма транзакции в копейках.\n- `status` — статус транзакции.\n- `clientId` — идентификатор клиента, которому был совершён перевод.\n  Если не указан, значит, транзакция является пополнением баланса агентства.\n\n#### Статус транзакции\n\n- `success` — транзакция успешно завершена.\n- `pending` — транзакция в обработке.\n- `failed` — при обработке транзакции произошла ошибка.\n- `blocked` — попытка провести транзакцию за 2 дня до окончания отчётного периода.\n  Такие транзакции не выполняются.\n",
+        "operationId": "agencyFinancesTransactionsHistory",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/authHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "dateFrom": {
+                    "$ref": "#/components/schemas/dateTime"
+                  },
+                  "dateTo": {
+                    "$ref": "#/components/schemas/dateTime"
+                  },
+                  "limit": {
+                    "$ref": "#/components/schemas/limit"
+                  },
+                  "offset": {
+                    "$ref": "#/components/schemas/offset"
+                  }
+                },
+                "required": [
+                  "dateFrom",
+                  "dateTo",
+                  "limit",
+                  "offset"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "description": "Информация об операциях с балансом агентства",
+                      "items": {
+                        "additionalProperties": false,
+                        "description": "Информация об операции с балансом агентства",
+                        "properties": {
+                          "amount": {
+                            "$ref": "#/components/schemas/amountKopecks"
+                          },
+                          "clientId": {
+                            "$ref": "#/components/schemas/id"
+                          },
+                          "operationDateTime": {
+                            "$ref": "#/components/schemas/dateTime"
+                          },
+                          "status": {
+                            "description": "Статус транзакции",
+                            "enum": [
+                              "pending",
+                              "success",
+                              "blocked",
+                              "failed"
+                            ],
+                            "example": "success",
+                            "type": "string"
+                          },
+                          "transactionId": {
+                            "$ref": "#/components/schemas/transactionId"
+                          }
+                        },
+                        "required": [
+                          "transactionId",
+                          "operationDateTime",
+                          "amount",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Успешный ответ"
+          },
+          "400": {
+            "$ref": "#/components/responses/defaultBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/defaultUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/defaultForbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/defaultTooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/defaultInternalServerError"
+          }
+        },
+        "security": [
+          {
+            "ClientCredentials": []
+          }
+        ],
+        "summary": "Получение всех операций с балансом агентства",
+        "tags": [
+          "balance",
+          "Авито Promo"
+        ],
+        "x-avito-section": {
+          "slug": "avito-promo",
+          "title": "Авито Promo"
+        }
+      }
+    },
+    "/api/1/agency/users/invite/send": {
+      "post": {
+        "description": "Данный метод отправляет приглашение новому клиенту.\n\n### Параметры тела запроса\n\n- `userId` — идентификатор приглашаемого пользователя.\n- `type` — тип необходимой связи клиента с агентством: `adv` — по рекламной, `trx` — по транзакционной модели.\n\n### Успешный ответ\n\nМетод возвращает назад идентификатор приглашения `result.inviteId`,\n  с помощью которого можно будет получить его статус\n  (см. метод [Получение статуса приглашения нового клиента](#operation/agencyUsersInviteStatus)),\n  а также статус верификации рекламного аккаунта клиента\n  (см. метод [Получение статуса верификации нового клиента](#operation/agencyUsersVerificationStatus)).\n",
+        "operationId": "agencyUsersInviteSend",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/authHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "$ref": "#/components/schemas/linkType"
+                  },
+                  "userId": {
+                    "$ref": "#/components/schemas/id"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "type"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/inviteId"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/okResponseStatus"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "result"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Успешный ответ"
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequestWithStatus"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundWithStatus"
+          },
+          "429": {
+            "$ref": "#/components/responses/defaultTooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/defaultInternalServerError"
+          }
+        },
+        "security": [
+          {
+            "ClientCredentials": []
+          }
+        ],
+        "summary": "Отправка приглашения нового клиента",
+        "tags": [
+          "invite",
+          "Авито Promo"
+        ],
+        "x-avito-section": {
+          "slug": "avito-promo",
+          "title": "Авито Promo"
+        }
+      }
+    },
+    "/api/1/agency/users/invite/status": {
+      "post": {
+        "description": "Данный метод позволяет получить статус отправленного приглашения нового клиента.\n\n### Параметры тела запроса\n\n- `inviteId` — идентификатор отправленного приглашения\n  (см. метод [Отправка приглашения нового клиента](#operation/agencyUsersInviteSend)).\n\n### Успешный ответ\n\nМетод возвращает назад статус приглашения `result.status`:\n\n- `pending` — приглашение ожидает подтверждения клиентом.\n- `success` — приглашение успешно подтверждено.\n- `decline` — приглашение отклонено клиентом.\n",
+        "operationId": "agencyUsersInviteStatus",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/authHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/inviteId"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "result": {
+                      "additionalProperties": false,
+                      "description": "Информация о приглашении нового клиента",
+                      "properties": {
+                        "status": {
+                          "description": "Статус приглашения нового клиента",
+                          "enum": [
+                            "pending",
+                            "success",
+                            "decline"
+                          ],
+                          "example": "success",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status"
+                      ],
+                      "type": "object"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/okResponseStatus"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "result"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Успешный ответ"
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequestFieldsWithStatus"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundWithStatus"
+          },
+          "429": {
+            "$ref": "#/components/responses/defaultTooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/defaultInternalServerError"
+          }
+        },
+        "security": [
+          {
+            "ClientCredentials": []
+          }
+        ],
+        "summary": "Получение статуса приглашения нового клиента",
+        "tags": [
+          "invite",
+          "Авито Promo"
+        ],
+        "x-avito-section": {
+          "slug": "avito-promo",
+          "title": "Авито Promo"
+        }
+      }
+    },
+    "/api/1/agency/users/verificationStatus": {
+      "post": {
+        "description": "Данный метод позволяет получить статус верификации подтвердившего приглашение клиента.\n\n### Параметры тела запроса\n\n- `inviteId` — идентификатор приглашения клиента\n  (см. метод [Отправка приглашения нового клиента](#operation/agencyUsersInviteSend)).\n\n### Успешный ответ\n\nМетод возвращает назад статус приглашения `result.status`:\n\n- `verified` — клиент верифицирован.\n- `not-verified` — клиент ещё не верифицирован.\n\nВ том числе метод возвращает идентификатор подтвердившего приглашение клиента `result.userId`.\nЕсли при приглашении был указан тип связи по рекламной модели\n  (см. метод [Отправка приглашения нового клиента](#operation/agencyUsersInviteSend)),\n  то также возвращается идентификатор рекламного аккаунта клиента `result.agencyClientUserId`.\n",
+        "operationId": "agencyUsersVerificationStatus",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/authHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/inviteId"
+              }
+            }
+          },
+          "description": "Тело запроса",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "result": {
+                      "additionalProperties": false,
+                      "description": "Информация о статусе верификации нового клиента",
+                      "properties": {
+                        "agencyClientUserId": {
+                          "$ref": "#/components/schemas/id"
+                        },
+                        "status": {
+                          "description": "Статус верификации нового клиента",
+                          "enum": [
+                            "verified",
+                            "not-verified"
+                          ],
+                          "example": "verified",
+                          "type": "string"
+                        },
+                        "userId": {
+                          "$ref": "#/components/schemas/id"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "userId"
+                      ],
+                      "type": "object"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/okResponseStatus"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "result"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Успешный ответ"
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequestFieldsWithStatus"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundWithStatus"
+          },
+          "429": {
+            "$ref": "#/components/responses/defaultTooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/defaultInternalServerError"
+          }
+        },
+        "security": [
+          {
+            "ClientCredentials": []
+          }
+        ],
+        "summary": "Получение статуса верификации нового клиента",
+        "tags": [
+          "invite",
+          "Авито Promo"
+        ],
+        "x-avito-section": {
+          "slug": "avito-promo",
+          "title": "Авито Promo"
+        }
+      }
+    },
+    "/stats/v2/accounts/{user_id}/items": {
+      "post": {
+        "description": "Получение статистических показателей по профилю.\n### Группировки показателей\nИспользуйте группировки, чтобы получать конкретную статистику.  Например, можете запросить только общие значения показателей, а если нужны подробности, — значения показателей по каждому объявлению или за определённый период. Доступные группировки:\n\n  - **totals** — по общему значению показателя за определённый период, без детализации;\n  - **item** — по объявлениям;\n  - **day** — по дням;\n  - **week** — по неделям;\n  - **month** — по месяцам.\n\n\n### Доступные показатели по объявлениям\n#### Основные\n\n  - **views** - Просмотры. Сколько раз объявление показывалось в результатах поиска и рекомендациях. Несколько показов за сутки одному пользователю считаются как один.\n  - **contacts** - Контакты. Количество пользователей, которые посмотрели ваш номер, написали в чат или откликнулись на скидку после рассылки. Несколько контактов за сутки от одного пользователя считаются как один.\n    - **contactsShowPhone** - Посмотрели телефон. Количество пользователей, которые посмотрели ваш телефон или нажали «Позвонить». Несколько таких действий за сутки от одного пользователя считаются как один.\n    - **contactsMessenger** - Написали в чат. Количество пользователей, которые написали вам. Несколько чатов за сутки от одного пользователя считаются как один.\n    - **contactsShowPhoneAndMessenger** - Посмотрели телефон и написали в чат. Количество пользователей, которые и посмотрели ваш телефон, и написали в чат. Несколько таких действий за сутки от одного пользователя считаются как один.\n    - **contactsSbcDiscount** - Откликнулись на скидку в чате. Количество пользователей, которые приняли ваше спецпредложение после рассылки.\n  - **viewsToContactsConversion** - Конверсия из просмотров в контакты. Процент пользователей, которые после перехода в объявление посмотрели ваш телефон или написали в чат.\n  - **favorites** - Добавили в избранное. Сколько раз объявление добавили в избранное.\n  - **averageViewCost** - Средняя цена просмотра. Расходы на размещение и продвижение объявлений делятся на число просмотров.\n  - **averageContactCost** - Средняя цена контакта. Расходы на размещение и продвижение объявлений делятся на число контактов.\n  - **impressions** - Показы. Сколько раз объявление показывалось в результатах поиска и рекомендациях. Несколько показов за сутки одному пользователю считаются как один.\n  - **impressionsToViewsConversion** - Конверсия из показов в просмотры. Процент пользователей, которые перешли в объявление после того, как оно показалось в результатах поиска и рекомендациях.\n\n\n#### Целевые действия\n\n  - **clickPackages**\t- Целевые просмотры. Просмотры, которые оплачены из тарифа и считаются целевыми [по правилам Авито](https://www.avito.ru/legal/rules/paid_services/cost-per-action/#clicks).\n  - **jobContacts** - Отклики на вакансии. Отклики, которые оплачены из тарифа и считаются целевыми [по правилам Авито](https://www.avito.ru/legal/rules/paid_services/cost-per-action/#clicks).\n\n\n#### Заказы с Авито Доставкой\n\n  - **viewsToOrderedItemsConversion** - Конверсия из просмотров в заказанные товары. Процент пользователей, которые после перехода в объявление заказали товар.\n  - **orderedItems** - Заказано товаров. Количество товаров, которые заказали с Авито Доставкой.\n  - **orderedItemsPrice** - Стоимость заказанных товаров в копейках. Общая стоимость заказов. Это сумма, которую вы получите на руки, если клиенты примут заказы.\n  - **deliveredItems** - Доставлено товаров. Количество товаров, которые заказали с Авито Доставкой и уже приняли.\n  - **deliveredItemsPrice** - Стоимость доставленных товаров в копейках. Общая стоимость заказов, которые покупатели приняли. Это сумма, которую вы получаете на руки.\n\n\n#### Посуточная аренда\n\n  - **bookingPlacedCount** - Получено заявок. Общее количество заявок на бронирование\n  - **bookingPlacedPrice** - Стоимость полученных заявок в копейках. Общая стоимость бронирований. Это сумма, которую вы получите на руки, если гости заселятся.\n  - **bookingApprovedCount** - Подтверждено заявок. Количество заявок на бронирование, которые вы подтвердили.\n  - **bookingApprovedPrice** - Стоимость подтвержденных заявок в копейках. Общая стоимость бронирований, которые вы подтвердили. Это сумма, которую вы получите на руки, если гости заселятся.\n  - **bookingAcceptedCount** - Заявки с заселением. Количество бронирований, по которым заселились гости. Заселение засчитывается в 15:00 по Москве на следующий день после заезда.\n  - **bookingAcceptedPrice** - Стоимость заявок с заселением в копейках. Общая стоимость бронирований, по которым заселились гости. Это сумма, которую вы получаете на руки.\n\n\n#### Расходы\n\n  - **allSpending** - Все расходы в копейках. Сколько всего денег и бонусов вы потратили на объявления.\n    - **spending** - Расходы на объявления в копейках. Сколько денег вы потратили на размещение, продвижение, целевые действия и комиссию.\n      - **presenceSpending** - Расходы на размещение и целевые действия в копейках. Сколько денег вы потратили на размещения и целевые действия — просмотры, чаты, звонки и отклики.\n      - **promoSpending** - Расходы на продвижение в копейках. Сколько денег вы потратили на продвижение и на услуги, которые влияют на внешний вид объявления.\n      - **restSpending** - Остальные расходы в копейках. Сколько денег вы потратили на чат-ботов и услуги, которые система не смогла распознать.\n      - **commission** - Комиссия в копейках. Какую комиссию вы заплатили за заказы с Авито Доставкой, которые приняли покупатели, а также за бронирования жилья.\n    - **spendingBonus** - Списано бонусов на объявления. Сколько бонусов вы потратили на размещение, продвижение, целевые действия и комиссию.\n\n\n#### Количество объявлений за период\n\n  - **activeItems** - Активные объявления. Объявления, которые прошли проверку и появились в поиске.        \n    - **newActiveItems** - Новые и опубликованные заново объявления. Сколько объявлений опубликовано впервые или повторно.\n    - **oldActiveItems** - Активны с прошлого периода. Сколько объявлений остаются опубликованными с предыдущего периода.\n\n\n### Примечания\n\n  * Из ручки возвращается не более чем по 1000 сущностей. Вы можете использовать поля запроса limit и offset для регулировки выбранного диапазона.\n  * Глубина данных статистики такого запроса ограничена 270 днями.\n  * В случае недоступности метрики для пользователя она не приходит в ответе. \n  * Система позволяет делать не более одного запроса в минуту на данный метод.\n",
+        "operationId": "itemAnalytics",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyticsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsResponse"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Неверный запрос"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Требуется аутентификация"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Доступ запрещен"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Слишком много запросов"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error response"
+          }
+        },
+        "security": [
+          {
+            "AuthorizationCode": [
+              "stats:read"
+            ]
+          },
+          {
+            "ClientCredentials": []
+          }
+        ],
+        "summary": "Получение статистических показателей по профилю",
+        "tags": [
+          "Item",
+          "Объявления",
+          "statistics",
+          "Авито Promo"
+        ],
+        "x-avito-also-in": [
+          {
+            "slug": "avito-promo",
+            "title": "Авито Promo"
+          }
+        ],
+        "x-avito-section": {
+          "slug": "item",
+          "title": "Объявления"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/userId"
+        },
+        {
+          "$ref": "#/components/parameters/authHeader"
+        },
+        {
+          "$ref": "#/components/parameters/applicationJsonHeader"
+        }
+      ],
+      "x-rate-limiter": {
+        "default": 1
+      }
+    },
+    "/stats/v2/accounts/{user_id}/spendings": {
+      "post": {
+        "description": "Получение статистики расходов профиля.\n\n**Внимание:** Глубина данных статистики такого запроса ограничена 270 днями.\n\n**Внимание:** Система позволяет делать не более одного запроса в минуту на данный метод.\n\n### Группировки расходов\nИспользуйте группировки, чтобы получать конкретную статистику. Доступные группировки:\n\n  - **day** — по дням;\n  - **week** — по неделям;\n  - **month** — по месяцам.\n\n\n### Доступные типы расходов\n\n  - **all** - Все расходы в копейках. Сколько всего денег вы потратили на объявления и прочие услуги.\n    - **promotion** - Расходы на продвижение в копейках. Сколько денег вы потратили на продвижение объявлений и услуги, которые влияют на внешний вид объявления.\n    - **presence** - Расходы на размещение и целевые действия в копейках. Сколько денег вы потратили на размещение объявлений и целевые действия с ними — просмотры, чаты, звонки и отклики.\n    - **commission** - Комиссия в копейках. Какую комиссию вы заплатили за заказы с Авито Доставкой, которые приняли покупатели, а также за бронирование жилья.\n    - **rest** - Остальные расходы в копейках. Сколько денег вы потратили на чат-ботов и услуги, которые система не смогла распознать.\n",
+        "operationId": "accountSpendings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpendingsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpendingsResponse"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Неверный запрос"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Требуется аутентификация"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Доступ запрещен"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Слишком много запросов"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error response"
+          }
+        },
+        "security": [
+          {
+            "AuthorizationCode": [
+              "stats:read"
+            ]
+          },
+          {
+            "ClientCredentials": []
+          }
+        ],
+        "summary": "Получение статистики расходов профиля",
+        "tags": [
+          "Item",
+          "Объявления",
+          "statistics",
+          "Авито Promo"
+        ],
+        "x-avito-also-in": [
+          {
+            "slug": "avito-promo",
+            "title": "Авито Promo"
+          }
+        ],
+        "x-avito-section": {
+          "slug": "item",
+          "title": "Объявления"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/userId"
+        },
+        {
+          "$ref": "#/components/parameters/authHeader"
+        },
+        {
+          "$ref": "#/components/parameters/applicationJsonHeader"
+        }
+      ],
+      "x-rate-limiter": {
+        "default": 1
       }
     },
     "/calltracking/v1/getCallById/": {
@@ -12451,7 +14017,7 @@
         }
       ],
       "post": {
-        "description": "\nНефункциональные требования:\n\nМаксимальный размер тела запроса - 400MB<br/>\nМаксимальное количество направлений - 1 миллион\n\nМетод позволяет службам доставки самостоятельно управлять:\n  1. Доступностью направлений доставки\n  2. Стоимостью доставки по каждому из направлений\n  3. Сроками доставки по каждому из направлений\n\n## Используемые термины:\n\n- **Пункт выдачи заказов (ПВЗ)(Terminal)** - место, в котором в зависимости от списка предоставляемых услуг пользователь может сдать/получить/вернуть посылку\n\n- **Область доставки (Area)** - зона (список индексов Почты России), в которой осуществляется курьерская доставка/забор посылок\n\n- **Хаб/Сортировочный центр (SortingCenter)** - место, где сортируются посылки для дальнейшей отправки в ПВЗ (используется для кросс-доставки)\n\n- **Тэг направления(Tag)** - используется для объединения в группу ПВЗ/Областей доставки/Сортировочных центров\n    является свойством объекта ПВЗ или области доставки.\n\n    Допускается распределять тэги по ПВЗ/Областям доставки/Сортировочным центрам любым образом, при этом наиболее распространенным критерием для тэгирования является географическая близость ПВЗ/Областей доставки/Сортировочных центров друг к другу или принадлежность к одному административному субъекту.\n\n- **Тарифная зона доставки(TariffZone)** - список правил и параметров необходимых для расчета стоимости различных услуг, которые будут оказаны в процессе доставки заказа, в том числе с разделением на C2C и B2C.\n    Сумма стоимостей по всем услугам перечисленным в тарифной зоне равна расчетной стоимости, которую Авито заплатит службе доставки за доставку заказа.\n    Важно отметить, что допускается загрузка только уникальных тарифных зон - то есть, в одном тарифе не может существовать двух тарифных зон с одинаковыми значениями поля *items*\n\n- **Зона сроков доставки(TermsZone)** - список правил и параметров необходимых для расчета сроков доставки.\n    Как минимальный, так и максимальный срок передаются в рабочих днях.\n    Важно отметить, что допускается загрузка только уникальных зон сроков доставки - то есть, в одном тарифе не может существовать двух зон сроков доставки с одинаковыми значениями поля *minTerm* и *maxTerm*\n\n- **Направление доставки(Direction)** - объект определяющий возможность доставки из directionTagFrom (группа ПВЗ / список индексов_Почты_России в случае курьерской доставки), в directionTagTo (группу ПВЗ / список индексов_Почты_России в случае курьерской доставки).\n    При этом направление так же определяет условия, на которых доставка будет осуществляться: тарифную зону и сроки доставки\n\n- **Тарифный план(Tariff)** - список всех возможных направлений доставки, действующий на определенном интервале времени (например, до подписания договора об изменении тарифов)\n\n## Диаграмма связей между используемыми объектами:\n\n<img src=\"https://www.avito.st/s/avito/components/api-description/delivery/images/tariff_diagram_v2.svg\" />\n\n### Инсталляция (первое добавление службой доставки тарифов):\n>1. [Создать тариф](#operation/AddTariffSandboxV2)\n>Для каждого направления в тарифе нужно указать те типы доставки, которые по нему доступны.\n>2. Загрузить [ПВЗ](#operation/AddTerminalsSandbox)/[Области_доставки](#operation/AddAreasSandbox) и свои [сортировочные центры](#operation/AddSortingCenter), если требуется\n--\n\n*Дополнительно для подключения к кросс доставке:*  \n>3. [Скачать чужие сортировочные центры](#operation/GetSortingCenter)  \n>4. Установить чужим сортировочным центрам тэги из своего тарифа, который был загружен на шаге 1  \n>5. [Загрузить чужие сортировочные центры с тэгами из своего тарифа](#operation/AddTagsToSortingCenter)  \n\n#### Схема работы кросс доставочного тарифа\n\n<img src=\"https://avito.st/static/ims/1a890394-cde9-49cf-b2e0-dd5b00dd9a97_new_xdelivery_common_2490x1380.png\" />\n\n### Бесшовное обновление тарифа\n\nПри использовании данного подхода к обновлению тарифа отсутствует момент даунтайма - то есть отсутствия ПВЗ/Областей_доставки службы доставки на карте Авито.\n  1. Необходимо загрузить новый тариф и сообщить номер залитого тарифа вашему менеджеру по логистике в Авито\n    - Для загрузки тарифа используется [метод загрузки тарифа](#operation/AddTariffSandbox)\n    - Для получения результата загрузки тарифа используется [метод получения результата выполнения задачи](#operation/GetTariffTaskSandbox). Необходимо убедиться в отсутствии ошибок загрузки тарифа\n  2. Дождаться пока ваш менеджер подтвердит, что загруженные данные корректны\n  3. Добавить к загруженному выше тарифу ПВЗ/Области доставки/Сортировочные центры\n    - Для загрузки ПВЗ используется [метод загрузки ПВЗ](#operation/AddTerminalsSandbox). Важно учесть, что в URL необходимо указать id загруженного на предыдущем этапе тарифа\n    - Для получения результата загрузки ПВЗ используется [метод получения результата выполнения задачи](#operation/GetTerminalsTaskSandbox). Необходимо убедиться в отсутствии ошибок загрузки ПВЗ\n  4. Сообщить вашему менеджеру по логистике в Авито о том, что ПВЗ к тарифу успешно загружены\n\n### Описание ошибок\n| http code |   error code   |       error message                                      |\n|-----------|----------------|----------------------------------------------------------|\n|    200    | INVALID_ENTITY | Failed to convert entities: {error description}          |\n|    200    | INVALID_ENTITY | Failed to get entities from request: {error description} |\n",
+        "description": "\nНефункциональные требования:\n\nМаксимальный размер тела запроса - 400MB<br/>\nМаксимальное количество направлений - 1 миллион\n\nМетод позволяет службам доставки самостоятельно управлять:\n  1. Доступностью направлений доставки\n  2. Стоимостью доставки по каждому из направлений\n  3. Сроками доставки по каждому из направлений\n\n## Используемые термины:\n\n- **Пункт выдачи заказов (ПВЗ)(Terminal)** - место, в котором в зависимости от списка предоставляемых услуг пользователь может сдать/получить/вернуть посылку\n\n- **Область доставки (Area)** - зона (список индексов Почты России), в которой осуществляется курьерская доставка/забор посылок\n\n- **Хаб/Сортировочный центр (SortingCenter)** - место, где сортируются посылки для дальнейшей отправки в ПВЗ (используется для кросс-доставки)\n\n- **Тэг направления(Tag)** - используется для объединения в группу ПВЗ/Областей доставки/Сортировочных центров\n    является свойством объекта ПВЗ или области доставки.\n\n    Допускается распределять тэги по ПВЗ/Областям доставки/Сортировочным центрам любым образом, при этом наиболее распространенным критерием для тэгирования является географическая близость ПВЗ/Областей доставки/Сортировочных центров друг к другу или принадлежность к одному административному субъекту.\n\n- **Тарифная зона доставки(TariffZone)** - список правил и параметров необходимых для расчета стоимости различных услуг, которые будут оказаны в процессе доставки заказа, в том числе с разделением на C2C и B2C.\n    Сумма стоимостей по всем услугам перечисленным в тарифной зоне равна расчетной стоимости, которую Авито заплатит службе доставки за доставку заказа.\n    Важно отметить, что допускается загрузка только уникальных тарифных зон - то есть, в одном тарифе не может существовать двух тарифных зон с одинаковыми значениями поля *items*\n\n- **Зона сроков доставки(TermsZone)** - список правил и параметров необходимых для расчета сроков доставки.\n    Как минимальный, так и максимальный срок передаются в рабочих днях.\n    Важно отметить, что допускается загрузка только уникальных зон сроков доставки - то есть, в одном тарифе не может существовать двух зон сроков доставки с одинаковыми значениями поля *minTerm* и *maxTerm*\n\n- **Направление доставки(Direction)** - объект определяющий возможность доставки из directionTagFrom (группа ПВЗ / список индексов_Почты_России в случае курьерской доставки), в directionTagTo (группу ПВЗ / список индексов_Почты_России в случае курьерской доставки).\n    При этом направление так же определяет условия, на которых доставка будет осуществляться: тарифную зону и сроки доставки\n\n- **Тарифный план(Tariff)** - список всех возможных направлений доставки, действующий на определенном интервале времени (например, до подписания договора об изменении тарифов)\n\n## Диаграмма связей между используемыми объектами:\n\n<img src=\"https://www.avito.st/s/avito/components/api-description/delivery/images/tariff_diagram_v2.svg\" />\n\n### Инсталляция (первое добавление службой доставки тарифов):\n>1. [Создать тариф](#operation/AddTariffSandboxV2)\n>Для каждого направления в тарифе нужно указать те типы доставки, которые по нему доступны.\n>2. Загрузить [ПВЗ](#operation/AddTerminalsSandbox)/[Области_доставки](#operation/AddAreasSandbox) и свои [сортировочные центры](#operation/AddSortingCenter), если требуется\n--\n\n*Дополнительно для подключения к кросс доставке:*  \n>3. [Скачать чужие сортировочные центры](#operation/GetSortingCenter)  \n>4. Установить чужим сортировочным центрам тэги из своего тарифа, который был загружен на шаге 1  \n>5. [Загрузить чужие сортировочные центры с тэгами из своего тарифа](#operation/AddTagsToSortingCenter)  \n\n#### Схема работы кросс доставочного тарифа\n\n<img src=\"https://avito.st/static/ims/1a890394-cde9-49cf-b2e0-dd5b00dd9a97_new_xdelivery_common_2490x1380.png\" />\n\n### Бесшовное обновление тарифа\n\nПри использовании данного подхода к обновлению тарифа отсутствует момент даунтайма - то есть отсутствия ПВЗ/Областей_доставки службы доставки на карте Авито.\n  1. Необходимо загрузить новый тариф и сообщить номер залитого тарифа вашему менеджеру по логистике в Авито\n    - Для загрузки тарифа используется [метод загрузки тарифа](#operation/AddTariffSandbox)\n    - Для получения результата загрузки тарифа используется [метод получения результата выполнения задачи](#operation/GetTariffTaskSandbox). Необходимо убедиться в отсутствии ошибок загрузки тарифа\n  2. Дождаться пока ваш менеджер подтвердит, что загруженные данные корректны\n  3. Добавить к загруженному выше тарифу ПВЗ/Области доставки/Сортировочные центры\n    - Для загрузки ПВЗ используется [метод загрузки ПВЗ](#operation/AddTerminalsSandbox). Важно учесть, что в URL необходимо указать id загруженного на предыдущем этапе тарифа\n    - Для получения результата загрузки ПВЗ используется [метод получения результата выполнения задачи](#operation/GetTerminalsTaskSandbox). Необходимо убедиться в отсутствии ошибок загрузки ПВЗ\n  4. Сообщить вашему менеджеру по логистике в Авито о том, что ПВЗ к тарифу успешно загружены\n\n### Дополнительная валидация\n\nЕсли существует направление `тег 1` -> `тег 2` S-PUDO2S-PUDO, то **обязательно** должно существовать направление `тег 2` -> `тег 1` S-PUDO2S-PUDO для возможности возврата товара. \nВ таком случае при обработке задачи на загрузку тарифа будет ошибка вида `X directions have no reverse direction. Each tag1->tag2 S-PUDO2S-PUDO must have tag2->tag1 S-PUDO2S-PUDO direction as reverse.` Ошибка будет получена в [методе получения информации о задаче](#operation/GetTask). \n\n\n### Описание ошибок\n| http code |   error code   |       error message                                      |\n|-----------|----------------|----------------------------------------------------------|\n|    200    | INVALID_ENTITY | Failed to convert entities: {error description}          |\n|    200    | INVALID_ENTITY | Failed to get entities from request: {error description} |\n",
         "operationId": "AddTariffSandboxV2",
         "requestBody": {
           "content": {
@@ -14109,228 +15675,6 @@
           "slug": "item",
           "title": "Объявления"
         }
-      }
-    },
-    "/stats/v2/accounts/{user_id}/items": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/userId"
-        },
-        {
-          "$ref": "#/components/parameters/authHeader"
-        },
-        {
-          "$ref": "#/components/parameters/applicationJsonHeader"
-        }
-      ],
-      "post": {
-        "description": "Получение статистических показателей по профилю.\n### Группировки показателей\nИспользуйте группировки, чтобы получать конкретную статистику.  Например, можете запросить только общие значения показателей, а если нужны подробности, — значения показателей по каждому объявлению или за определённый период. Доступные группировки:\n\n  - **totals** — по общему значению показателя за определённый период, без детализации;\n  - **item** — по объявлениям;\n  - **day** — по дням;\n  - **week** — по неделям;\n  - **month** — по месяцам.\n\n\n### Доступные показатели по объявлениям\n#### Основные\n\n  - **views** - Просмотры. Сколько раз объявление показывалось в результатах поиска и рекомендациях. Несколько показов за сутки одному пользователю считаются как один.\n  - **contacts** - Контакты. Количество пользователей, которые посмотрели ваш номер, написали в чат или откликнулись на скидку после рассылки. Несколько контактов за сутки от одного пользователя считаются как один.\n    - **contactsShowPhone** - Посмотрели телефон. Количество пользователей, которые посмотрели ваш телефон или нажали «Позвонить». Несколько таких действий за сутки от одного пользователя считаются как один.\n    - **contactsMessenger** - Написали в чат. Количество пользователей, которые написали вам. Несколько чатов за сутки от одного пользователя считаются как один.\n    - **contactsShowPhoneAndMessenger** - Посмотрели телефон и написали в чат. Количество пользователей, которые и посмотрели ваш телефон, и написали в чат. Несколько таких действий за сутки от одного пользователя считаются как один.\n    - **contactsSbcDiscount** - Откликнулись на скидку в чате. Количество пользователей, которые приняли ваше спецпредложение после рассылки.\n  - **viewsToContactsConversion** - Конверсия из просмотров в контакты. Процент пользователей, которые после перехода в объявление посмотрели ваш телефон или написали в чат.\n  - **favorites** - Добавили в избранное. Сколько раз объявление добавили в избранное.\n  - **averageViewCost** - Средняя цена просмотра. Расходы на размещение и продвижение объявлений делятся на число просмотров.\n  - **averageContactCost** - Средняя цена контакта. Расходы на размещение и продвижение объявлений делятся на число контактов.\n  - **impressions** - Показы. Сколько раз объявление показывалось в результатах поиска и рекомендациях. Несколько показов за сутки одному пользователю считаются как один.\n  - **impressionsToViewsConversion** - Конверсия из показов в просмотры. Процент пользователей, которые перешли в объявление после того, как оно показалось в результатах поиска и рекомендациях.\n\n\n#### Целевые действия\n\n  - **clickPackages**\t- Целевые просмотры. Просмотры, которые оплачены из тарифа и считаются целевыми [по правилам Авито](https://www.avito.ru/legal/rules/paid_services/cost-per-action/#clicks).\n  - **jobContacts** - Отклики на вакансии. Отклики, которые оплачены из тарифа и считаются целевыми [по правилам Авито](https://www.avito.ru/legal/rules/paid_services/cost-per-action/#clicks).\n\n\n#### Заказы с Авито Доставкой\n\n  - **viewsToOrderedItemsConversion** - Конверсия из просмотров в заказанные товары. Процент пользователей, которые после перехода в объявление заказали товар.\n  - **orderedItems** - Заказано товаров. Количество товаров, которые заказали с Авито Доставкой.\n  - **orderedItemsPrice** - Стоимость заказанных товаров в копейках. Общая стоимость заказов. Это сумма, которую вы получите на руки, если клиенты примут заказы.\n  - **deliveredItems** - Доставлено товаров. Количество товаров, которые заказали с Авито Доставкой и уже приняли.\n  - **deliveredItemsPrice** - Стоимость доставленных товаров в копейках. Общая стоимость заказов, которые покупатели приняли. Это сумма, которую вы получаете на руки.\n\n\n#### Посуточная аренда\n\n  - **bookingPlacedCount** - Получено заявок. Общее количество заявок на бронирование\n  - **bookingPlacedPrice** - Стоимость полученных заявок в копейках. Общая стоимость бронирований. Это сумма, которую вы получите на руки, если гости заселятся.\n  - **bookingApprovedCount** - Подтверждено заявок. Количество заявок на бронирование, которые вы подтвердили.\n  - **bookingApprovedPrice** - Стоимость подтвержденных заявок в копейках. Общая стоимость бронирований, которые вы подтвердили. Это сумма, которую вы получите на руки, если гости заселятся.\n  - **bookingAcceptedCount** - Заявки с заселением. Количество бронирований, по которым заселились гости. Заселение засчитывается в 15:00 по Москве на следующий день после заезда.\n  - **bookingAcceptedPrice** - Стоимость заявок с заселением в копейках. Общая стоимость бронирований, по которым заселились гости. Это сумма, которую вы получаете на руки.\n\n\n#### Расходы\n\n  - **allSpending** - Все расходы в копейках. Сколько всего денег и бонусов вы потратили на объявления.\n    - **spending** - Расходы на объявления в копейках. Сколько денег вы потратили на размещение, продвижение, целевые действия и комиссию.\n      - **presenceSpending** - Расходы на размещение и целевые действия в копейках. Сколько денег вы потратили на размещения и целевые действия — просмотры, чаты, звонки и отклики.\n      - **promoSpending** - Расходы на продвижение в копейках. Сколько денег вы потратили на продвижение и на услуги, которые влияют на внешний вид объявления.\n      - **restSpending** - Остальные расходы в копейках. Сколько денег вы потратили на чат-ботов и услуги, которые система не смогла распознать.\n      - **commission** - Комиссия в копейках. Какую комиссию вы заплатили за заказы с Авито Доставкой, которые приняли покупатели, а также за бронирования жилья.\n    - **spendingBonus** - Списано бонусов на объявления. Сколько бонусов вы потратили на размещение, продвижение, целевые действия и комиссию.\n\n\n#### Количество объявлений за период\n\n  - **activeItems** - Активные объявления. Объявления, которые прошли проверку и появились в поиске.        \n    - **newActiveItems** - Новые и опубликованные заново объявления. Сколько объявлений опубликовано впервые или повторно.\n    - **oldActiveItems** - Активны с прошлого периода. Сколько объявлений остаются опубликованными с предыдущего периода.\n\n\n### Примечания\n\n  * Из ручки возвращается не более чем по 1000 сущностей. Вы можете использовать поля запроса limit и offset для регулировки выбранного диапазона.\n  * Глубина данных статистики такого запроса ограничена 270 днями.\n  * В случае недоступности метрики для пользователя она не приходит в ответе. \n  * Система позволяет делать не более одного запроса в минуту на данный метод.\n",
-        "operationId": "itemAnalytics",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AnalyticsRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AnalyticsResponse"
-                }
-              }
-            },
-            "description": "Successful response"
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Неверный запрос"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Требуется аутентификация"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Доступ запрещен"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Слишком много запросов"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Error response"
-          }
-        },
-        "security": [
-          {
-            "AuthorizationCode": [
-              "stats:read"
-            ]
-          },
-          {
-            "ClientCredentials": []
-          }
-        ],
-        "summary": "Получение статистических показателей по профилю",
-        "tags": [
-          "Item",
-          "Объявления"
-        ],
-        "x-avito-section": {
-          "slug": "item",
-          "title": "Объявления"
-        }
-      },
-      "x-rate-limiter": {
-        "default": 1
-      }
-    },
-    "/stats/v2/accounts/{user_id}/spendings": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/userId"
-        },
-        {
-          "$ref": "#/components/parameters/authHeader"
-        },
-        {
-          "$ref": "#/components/parameters/applicationJsonHeader"
-        }
-      ],
-      "post": {
-        "description": "Получение статистики расходов профиля.\n\n**Внимание:** Глубина данных статистики такого запроса ограничена 270 днями.\n\n**Внимание:** Система позволяет делать не более одного запроса в минуту на данный метод.\n\n### Группировки расходов\nИспользуйте группировки, чтобы получать конкретную статистику. Доступные группировки:\n\n  - **day** — по дням;\n  - **week** — по неделям;\n  - **month** — по месяцам.\n\n\n### Доступные типы расходов\n\n  - **all** - Все расходы в копейках. Сколько всего денег вы потратили на объявления и прочие услуги.\n    - **promotion** - Расходы на продвижение в копейках. Сколько денег вы потратили на продвижение объявлений и услуги, которые влияют на внешний вид объявления.\n    - **presence** - Расходы на размещение и целевые действия в копейках. Сколько денег вы потратили на размещение объявлений и целевые действия с ними — просмотры, чаты, звонки и отклики.\n    - **commission** - Комиссия в копейках. Какую комиссию вы заплатили за заказы с Авито Доставкой, которые приняли покупатели, а также за бронирование жилья.\n    - **rest** - Остальные расходы в копейках. Сколько денег вы потратили на чат-ботов и услуги, которые система не смогла распознать.\n",
-        "operationId": "accountSpendings",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SpendingsRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SpendingsResponse"
-                }
-              }
-            },
-            "description": "Successful response"
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Неверный запрос"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Требуется аутентификация"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Доступ запрещен"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Слишком много запросов"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Error response"
-          }
-        },
-        "security": [
-          {
-            "AuthorizationCode": [
-              "stats:read"
-            ]
-          },
-          {
-            "ClientCredentials": []
-          }
-        ],
-        "summary": "Получение статистики расходов профиля",
-        "tags": [
-          "Item",
-          "Объявления"
-        ],
-        "x-avito-section": {
-          "slug": "item",
-          "title": "Объявления"
-        }
-      },
-      "x-rate-limiter": {
-        "default": 1
       }
     },
     "/job/v1/applications/apply_actions": {
@@ -24680,6 +26024,24 @@
         ],
         "type": "string"
       },
+      "FrequencyRule": {
+        "description": "Правило частотного ограничения",
+        "properties": {
+          "count": {
+            "description": "Количество показов за указанный период",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "period": {
+            "$ref": "#/components/schemas/FrequencyPeriod"
+          }
+        },
+        "required": [
+          "count",
+          "period"
+        ],
+        "type": "object"
+      },
       "Group": {
         "properties": {
           "accountID": {
@@ -24734,6 +26096,10 @@
           "budgetFrequency": {
             "$ref": "#/components/schemas/BudgetFrequency"
           },
+          "budgetKopeks": {
+            "description": "Бюджет группы в копейках с НДС",
+            "type": "integer"
+          },
           "campaignID": {
             "description": "ID кампании",
             "type": "integer"
@@ -24755,6 +26121,13 @@
           },
           "frequencyPeriod": {
             "$ref": "#/components/schemas/FrequencyPeriod"
+          },
+          "frequencyRules": {
+            "description": "Правила частотного ограничения",
+            "items": {
+              "$ref": "#/components/schemas/FrequencyRule"
+            },
+            "type": "array"
           },
           "haveCreative": {
             "description": "Есть ли в группе креатив",
@@ -24801,6 +26174,10 @@
           },
           "priceControl": {
             "$ref": "#/components/schemas/GroupPriceControl"
+          },
+          "priceKopeks": {
+            "description": "Цена в копейках с НДС",
+            "type": "integer"
           },
           "scheduleType": {
             "$ref": "#/components/schemas/ScheduleType"
@@ -24880,7 +26257,8 @@
         },
         "required": [
           "startASAP",
-          "frequencyCount"
+          "frequencyCount",
+          "frequencyRules"
         ],
         "type": "object"
       },
@@ -25332,6 +26710,14 @@
             "description": "Потрачено бонусов в рублях",
             "type": "integer"
           },
+          "spendBonusKopeks": {
+            "description": "Потрачено бонусов в копейках",
+            "type": "integer"
+          },
+          "spendKopeks": {
+            "description": "Потрачено денег в копейках",
+            "type": "integer"
+          },
           "timestamp": {
             "description": "Временная метка (гранулярность по дням). Заполняется в data[] и отсутствует в totalData.",
             "format": "date-time",
@@ -25470,11 +26856,16 @@
           "value": {
             "description": "Минимальное значение в рублях",
             "type": "integer"
+          },
+          "valueKopeks": {
+            "description": "Минимальное значение в копейках",
+            "type": "integer"
           }
         },
         "required": [
           "groupFormat",
-          "value"
+          "value",
+          "valueKopeks"
         ],
         "type": "object"
       },
@@ -25740,10 +27131,18 @@
         "properties": {
           "accountID": {
             "type": "integer"
+          },
+          "warnings": {
+            "description": "Предупреждения о частично невыполненных sandbox-операциях. Если массив пустой, аккаунт подготовлен полностью.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "required": [
-          "accountID"
+          "accountID",
+          "warnings"
         ],
         "type": "object"
       },
@@ -25984,6 +27383,15 @@
           "frequencyPeriod": {
             "$ref": "#/components/schemas/FrequencyPeriod"
           },
+          "frequencyRules": {
+            "description": "Правила частотного ограничения. Если передано, используется как основной формат; frequencyCount/frequencyPeriod сохраняются для обратной совместимости",
+            "items": {
+              "$ref": "#/components/schemas/FrequencyRule"
+            },
+            "maxItems": 2,
+            "nullable": true,
+            "type": "array"
+          },
           "name": {
             "description": "Название группы",
             "maxLength": 99,
@@ -26204,14 +27612,24 @@
             "description": "Баланс аккаунта  в рублях",
             "type": "integer"
           },
+          "balanceKopeks": {
+            "description": "Баланс аккаунта в копейках",
+            "type": "integer"
+          },
           "bonusBalance": {
-            "description": "Баланс бонусов на аккаунте",
+            "description": "Баланс бонусов на аккаунте в рублях",
+            "type": "integer"
+          },
+          "bonusBalanceKopeks": {
+            "description": "Баланс бонусов на аккаунте в копейках",
             "type": "integer"
           }
         },
         "required": [
           "balance",
-          "bonusBalance"
+          "balanceKopeks",
+          "bonusBalance",
+          "bonusBalanceKopeks"
         ],
         "type": "object"
       },
@@ -30853,7 +32271,8 @@
             "type": "number"
           },
           "imvUrl": {
-            "description": "Ссылка на страницу Авито IMV вида https://www.avito.ru/au-imv-info/2963331288",
+            "deprecated": true,
+            "description": "Поле больше не заполняется. Ссылка на страницу Авито IMV вида https://www.avito.ru/au-imv-info/2963331288",
             "example": "https://www.avito.ru/au-imv-info/2963331288",
             "nullable": true,
             "type": "string"
@@ -31510,6 +32929,12 @@
           "lastAction": {
             "description": "Последнее регистрационное действие",
             "example": "РФ - Постановка на регистрационный учет (02.06.2021)",
+            "type": "string"
+          },
+          "number": {
+            "description": "Номер ЭПТС",
+            "example": 123456789,
+            "nullable": true,
             "type": "string"
           },
           "otherRestrictions": {
@@ -37546,7 +38971,7 @@
         "description": "Информация об использовании в такси",
         "properties": {
           "dateFrom": {
-            "description": "Дата начала действия разрешения в UnixTime",
+            "description": "Дата начала действия разрешения в UnixTime, если 0 - дата неизвестна",
             "example": 1566507600,
             "type": "integer"
           },
@@ -38078,6 +39503,325 @@
           }
         },
         "type": "object"
+      },
+      "amountDouble": {
+        "description": "Сумма в рублях",
+        "example": 1000,
+        "format": "double",
+        "type": "number"
+      },
+      "amountKopecks": {
+        "description": "Сумма в копейках",
+        "example": 100000,
+        "type": "integer"
+      },
+      "badRequestResponseStatus": {
+        "description": "Статус ответа",
+        "enum": [
+          "bad-request"
+        ],
+        "example": "bad-request",
+        "type": "string"
+      },
+      "counter": {
+        "description": "Счетчик",
+        "example": 123,
+        "type": "integer"
+      },
+      "date": {
+        "description": "Дата в формате YYYY-MM-DD",
+        "example": "2025-05-02",
+        "format": "date",
+        "type": "string"
+      },
+      "dateTime": {
+        "description": "Дата в формате RFC3339",
+        "example": "2025-05-02T11:00:00+03:00",
+        "format": "date-time",
+        "type": "string"
+      },
+      "defaultErrorResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "additionalProperties": false,
+            "description": "Ошибка",
+            "properties": {
+              "code": {
+                "description": "Код ошибки",
+                "example": 1001,
+                "type": "integer"
+              },
+              "message": {
+                "$ref": "#/components/schemas/errorMessage"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "type": "object"
+      },
+      "errorField": {
+        "description": "Наименование поля",
+        "example": "userId",
+        "type": "string"
+      },
+      "errorFields": {
+        "description": "Ошибки валидации",
+        "items": {
+          "additionalProperties": false,
+          "description": "Ошибка валидации поля",
+          "properties": {
+            "field": {
+              "$ref": "#/components/schemas/errorField"
+            },
+            "message": {
+              "$ref": "#/components/schemas/errorMessage"
+            }
+          },
+          "required": [
+            "field",
+            "message"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "errorMessage": {
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "description": "Текст ошибки",
+            "example": "Что-то пошло не так",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object"
+      },
+      "errorResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/errorResult"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "errorResult": {
+        "additionalProperties": false,
+        "description": "Результат с ошибкой",
+        "properties": {
+          "message": {
+            "$ref": "#/components/schemas/errorMessage"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object"
+      },
+      "forbiddenResponseStatus": {
+        "description": "Статус ответа",
+        "enum": [
+          "forbidden"
+        ],
+        "example": "forbidden",
+        "type": "string"
+      },
+      "id": {
+        "description": "Идентификатор",
+        "example": 123456,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "ids": {
+        "description": "Список идентификаторов",
+        "items": {
+          "$ref": "#/components/schemas/id"
+        },
+        "minItems": 1,
+        "type": "array"
+      },
+      "inn": {
+        "description": "ИНН",
+        "example": 1234567890,
+        "maxLength": 12,
+        "minLength": 10,
+        "type": "string"
+      },
+      "inviteId": {
+        "additionalProperties": false,
+        "description": "Идентификатор приглашения нового клиента",
+        "properties": {
+          "inviteId": {
+            "$ref": "#/components/schemas/id"
+          }
+        },
+        "required": [
+          "inviteId"
+        ],
+        "type": "object"
+      },
+      "limit": {
+        "description": "Ограничение количества сущностей в выборке",
+        "example": 100,
+        "maximum": 1000,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "linkType": {
+        "description": "Тип связи с клиентом",
+        "enum": [
+          "adv",
+          "trx"
+        ],
+        "example": "adv",
+        "type": "string"
+      },
+      "notFoundResponseStatus": {
+        "description": "Статус ответа",
+        "enum": [
+          "not-found"
+        ],
+        "example": "not-found",
+        "type": "string"
+      },
+      "offset": {
+        "description": "Смещение, с которого начинается выборка",
+        "example": 10,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "okResponseStatus": {
+        "description": "Статус результата ответа",
+        "enum": [
+          "ok"
+        ],
+        "example": "ok",
+        "type": "string"
+      },
+      "statsMetric": {
+        "description": "Показатель статистики",
+        "enum": [
+          "views",
+          "contacts",
+          "contactsShowPhone",
+          "contactsMessenger",
+          "contactsShowPhoneAndMessenger",
+          "contactsSbcDiscount",
+          "viewsToContactsConversion",
+          "favorites",
+          "averageViewCost",
+          "averageContactCost",
+          "impressions",
+          "impressionsToViewsConversion",
+          "clickPackages",
+          "jobContacts",
+          "viewsToOrderedItemsConversion",
+          "orderedItems",
+          "orderedItemsPrice",
+          "deliveredItems",
+          "deliveredItemsPrice",
+          "bookingPlacedCount",
+          "bookingPlacedPrice",
+          "bookingApprovedCount",
+          "bookingApprovedPrice",
+          "bookingAcceptedCount",
+          "bookingAcceptedPrice",
+          "allSpending",
+          "spending",
+          "presenceSpending",
+          "promoSpending",
+          "restSpending",
+          "commission",
+          "spendingBonus",
+          "activeItems",
+          "newActiveItems",
+          "oldActiveItems"
+        ],
+        "example": "views",
+        "type": "string"
+      },
+      "statsMetricsGrouping": {
+        "description": "Тип группировки показателей",
+        "enum": [
+          "day",
+          "week",
+          "month",
+          "totals"
+        ],
+        "example": "month",
+        "type": "string"
+      },
+      "statsSpendingsGrouping": {
+        "description": "Тип группировки расходов",
+        "enum": [
+          "day",
+          "week",
+          "month"
+        ],
+        "example": "month",
+        "type": "string"
+      },
+      "targetTaskId": {
+        "additionalProperties": false,
+        "description": "Идентификатор задачи проверки ИНН клиентов",
+        "properties": {
+          "taskId": {
+            "$ref": "#/components/schemas/id"
+          }
+        },
+        "required": [
+          "taskId"
+        ],
+        "type": "object"
+      },
+      "timestamp": {
+        "description": "Временная метка",
+        "example": 1598958000,
+        "type": "integer"
+      },
+      "toggle": {
+        "description": "Переключатель",
+        "example": true,
+        "type": "boolean"
+      },
+      "transactionId": {
+        "description": "Идентификатор транзакции",
+        "example": "b52717c26fbc027acc34f165490fd4fdf404f3aa",
+        "minLength": 1,
+        "type": "string"
+      },
+      "transactionStatus": {
+        "description": "Статус транзакции",
+        "enum": [
+          "processing",
+          "success",
+          "error"
+        ],
+        "example": "success",
+        "type": "string"
+      },
+      "unauthorizedResponseStatus": {
+        "description": "Статус ответа",
+        "enum": [
+          "unauthorized"
+        ],
+        "example": "unauthorized",
+        "type": "string"
       },
       "Call": {
         "properties": {
@@ -40563,6 +42307,9 @@
           "options": {
             "$ref": "#/components/schemas/CreateParcelClientDeliveryCourierOptions"
           },
+          "pickupContact": {
+            "$ref": "#/components/schemas/CreateParcelClientDeliveryCourierPickupContact"
+          },
           "provider": {
             "description": "Cлужба доставки, которая будет осуществлять курьерскую доставку.",
             "example": "pecom-t2d",
@@ -40685,10 +42432,11 @@
             "type": "string"
           },
           "deliveryType": {
-            "description": "Тип курьерской доставки.\n\nНа текущий момент тип доставки всегда `DELIVERY_TO_DOOR`.\n",
+            "description": "Тип курьерской доставки.\n\n- `DELIVERY_TO_DOOR` – доставка до двери. Передается для получателя.\n- `DELIVERY_TO_PORCH` – доставка до подъезда. Передается для получателя.\n- `DELIVERY_FROM_DOOR` – забор от двери. Передается для отправителя в сценарии Дверь-Терминал.\n",
             "enum": [
               "DELIVERY_TO_DOOR",
-              "DELIVERY_TO_PORCH"
+              "DELIVERY_TO_PORCH",
+              "DELIVERY_FROM_DOOR"
             ],
             "example": "DELIVERY_TO_DOOR",
             "type": "string"
@@ -40703,6 +42451,25 @@
           "deliveryType",
           "deliveryConfirmationType",
           "elevatorAvailable"
+        ]
+      },
+      "CreateParcelClientDeliveryCourierPickupContact": {
+        "description": "Контактное лицо для забора посылки курьером. Заполняется для отправителя в сценарии Дверь-Терминал.\nМожет отличаться от имени отправителя (например, если отправитель – юридическое лицо).\n",
+        "properties": {
+          "name": {
+            "description": "ФИО контактного лица для забора посылки.",
+            "example": "Иванов Иван Иванович",
+            "type": "string"
+          },
+          "phone": {
+            "description": "Телефон контактного лица для забора посылки.",
+            "example": "+79999999999",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "phone"
         ]
       },
       "CreateParcelClientDeliverySecondPartyLogist": {
@@ -44101,6 +45868,13 @@
             ],
             "example": "PVZ",
             "title": "Тип терминала"
+          },
+          "unit": {
+            "description": "Дополнительный признак, по которому служба доставки может объединять терминалы в группы.\nНапример, принадлежность к одному филиалу, подразделению или другой логической группе терминалов.\nПоле необязательное. Если признак группировки неизвестен, поле можно не передавать или передать `null`.\n",
+            "example": "Москва",
+            "nullable": true,
+            "title": "признак группировки ПВЗ",
+            "type": "string"
           }
         },
         "required": [
@@ -44329,7 +46103,7 @@
             "type": "string"
           },
           "type": {
-            "description": "Буквенные обозначения типа являются DEPRECATED, используйте числовые обозначения.<br /><br />\nТип доставки, которую описывают данные условия\n<br />\n  `0` - `S-PUDO2S-PUDO`: Доставка из собственных ПВЗ в собственные ПВЗ<br /><br />\n  `3` - `S-AREA2S-AREA`: Доставка из собственной области доставки в собственную область доставки<br /><br />\n  `4` - `S-PUDO2S-AREA`: Доставка из собственных ПВЗ в собственные области доставки<br /><br />\n  `5` - `S-PUDO-BTW-F-HUB`: Доставка из своего ПВЗ в чужой ХАБ на прямом потоке или из чужого ХАБа в свой ПВЗ на обратном потоке<br />\n                  (тут важно обратить внимание, что только одна зона может быть установлена для одного tagFrom, \n                  что эквивалентно тому, что один свой ПВЗ может быть связан только с одним ХАБом чужой службы доставки)<br /><br />\n  `6` - `S-HUB-BTW-S-PUDO`: Доставка из своего ХАБа в свой ПВЗ на прямом потоке или из своего ПВЗ в свой ХАБ на обратном потоке<br /><br />\n",
+            "description": "Буквенные обозначения типа являются DEPRECATED, используйте числовые обозначения.<br /><br />\nТип доставки, которую описывают данные условия\n<br />\n  `0` - `S-PUDO2S-PUDO`: Доставка из собственных ПВЗ в собственные ПВЗ. Обратите внимание, что если существует направление `тег 1` -> `тег 2` S-PUDO2S-PUDO, то **обязательно** должно существовать направление `тег 2` -> `тег 1` S-PUDO2S-PUDO для возможности возврата товара<br /><br />\n  `3` - `S-AREA2S-AREA`: Доставка из собственной области доставки в собственную область доставки<br /><br />\n  `4` - `S-PUDO2S-AREA`: Доставка из собственных ПВЗ в собственные области доставки<br /><br />\n  `5` - `S-PUDO-BTW-F-HUB`: Доставка из своего ПВЗ в чужой ХАБ на прямом потоке или из чужого ХАБа в свой ПВЗ на обратном потоке<br />\n                  (тут важно обратить внимание, что только одна зона может быть установлена для одного tagFrom, \n                  что эквивалентно тому, что один свой ПВЗ может быть связан только с одним ХАБом чужой службы доставки)<br /><br />\n  `6` - `S-HUB-BTW-S-PUDO`: Доставка из своего ХАБа в свой ПВЗ на прямом потоке или из своего ПВЗ в свой ХАБ на обратном потоке<br /><br />\n",
             "enum": [
               "0",
               "3",
@@ -48631,7 +50405,7 @@
             "type": "integer"
           },
           "employment": {
-            "description": "Занятость <br>\nВозможные значения:\n  - temporary - Временная\n  - full - Полная\n  - internship - Стажировка\n  - partial - Частичная\n\nЕсли ничего не выбрать то будет автоматически проставляться в зависимости от режима работы:\nПри flexible и partTime, тип занятости - partial.\nДля всех остальных full.\n",
+            "description": "Занятость <br>\nВозможные значения:\n  - temporary - Временная\n  - full - Полная\n  - partial - Частичная\n\nЕсли ничего не выбрать то будет автоматически проставляться в зависимости от режима работы:\nПри flexible и partTime, тип занятости - partial.\nДля всех остальных full.\n\ndeprecated значение internship будет заменено на temporary\n",
             "type": "string"
           },
           "experience": {
@@ -49397,7 +51171,7 @@
             "$ref": "#/components/schemas/VacancyEducationLevel"
           },
           "employment": {
-            "description": "Занятость <br>\nВозможные значения:\n  - temporary - Временная\n  - full - Полная\n  - internship - Стажировка\n  - partial - Частичная\n\nЕсли ничего не выбрать то будет автоматически проставляться в зависимости от графика работы: \nПри flexible и partTime, тип занятости - partial.\nßДля всех остальных full.\n",
+            "description": "Занятость <br>\nВозможные значения:\n  - temporary - Временная\n  - full - Полная\n  - partial - Частичная\n\nЕсли ничего не выбрать то будет автоматически проставляться в зависимости от графика работы: \nПри flexible и partTime, тип занятости - partial.\nßДля всех остальных full.\n\ndeprecated значение internship будет заменено на temporary\n",
             "nullable": true,
             "type": "string"
           },
@@ -49636,7 +51410,7 @@
         "type": "array"
       },
       "WorkHoursPerDay": {
-        "description": "Количество рабочих часов в день\n<br>\nПолучить актуальный список доступных значений можно из справочника `work_hours_per_day` через метод [getDictByID](/api-catalog/job/documentation#operation/getDictByID).\n<br>\nДля режима работы (schedule) равным \"Вахта (flyInFlyOut)\" недоступны значения \"13–15 часов\", \"Больше 15 часов\" \n<br>\nДля типа занятости (employment) равным \"Полная (full)\" недоступны значения \"До 4 часов\", \"4–5 часов\"\n<br>\nДля типов занятости (employment) равным \"Временная (temporary)\", \"Стажировка (internship)\", \"Частичная (partial)\" недоступно значение \"Больше 15 часов\"\n",
+        "description": "Количество рабочих часов в день\n<br>\nПолучить актуальный список доступных значений можно из справочника `work_hours_per_day` через метод [getDictByID](/api-catalog/job/documentation#operation/getDictByID).\n<br>\nДля режима работы (schedule) равным \"Вахта (flyInFlyOut)\" недоступны значения \"13–15 часов\", \"Больше 15 часов\" \n<br>\nДля типа занятости (employment) равным \"Полная (full)\" недоступны значения \"До 4 часов\", \"4–5 часов\"\n<br>\nДля типов занятости (employment) равным \"Временная (temporary)\", \"Частичная (partial)\" недоступно значение \"Больше 15 часов\"\n",
         "items": {
           "format": "int64",
           "type": "integer"
@@ -52894,20 +54668,6 @@
         ],
         "type": "object"
       },
-      "errorMessage": {
-        "additionalProperties": false,
-        "properties": {
-          "message": {
-            "description": "Текст ошибки",
-            "example": "Что-то пошло не так",
-            "type": "string"
-          }
-        },
-        "required": [
-          "message"
-        ],
-        "type": "object"
-      },
       "stockEditResult": {
         "properties": {
           "stocks": {
@@ -54353,6 +56113,33 @@
           "type": "string"
         }
       },
+      "agencyClientIdHeader": {
+        "description": "Идентификатор пользователя клиента",
+        "in": "header",
+        "name": "X-AgencyClientId",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/id"
+        }
+      },
+      "transactionIdPathParameter": {
+        "description": "Идентификатор транзакции",
+        "in": "path",
+        "name": "transaction_id",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/transactionId"
+        }
+      },
+      "userIdPathParameter": {
+        "description": "Идентификатор пользователя клиента",
+        "in": "path",
+        "name": "user_id",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/id"
+        }
+      },
       "sourceHeader": {
         "description": "Имя сервиса, отправляющего запрос",
         "in": "header",
@@ -54569,6 +56356,200 @@
           }
         },
         "description": "Unauthorized"
+      },
+      "badRequestFields": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "additionalProperties": false,
+              "properties": {
+                "result": {
+                  "$ref": "#/components/schemas/errorFields"
+                }
+              },
+              "required": [
+                "result"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Неверный запрос"
+      },
+      "badRequestFieldsWithStatus": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "additionalProperties": false,
+              "properties": {
+                "result": {
+                  "$ref": "#/components/schemas/errorFields"
+                },
+                "status": {
+                  "$ref": "#/components/schemas/badRequestResponseStatus"
+                }
+              },
+              "required": [
+                "status",
+                "result"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Неверный запрос"
+      },
+      "badRequestWithStatus": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "additionalProperties": false,
+              "properties": {
+                "result": {
+                  "$ref": "#/components/schemas/errorResult"
+                },
+                "status": {
+                  "$ref": "#/components/schemas/badRequestResponseStatus"
+                }
+              },
+              "required": [
+                "status",
+                "result"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Неверный запрос"
+      },
+      "defaultBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/defaultErrorResponse"
+            }
+          }
+        },
+        "description": "Неверный запрос"
+      },
+      "defaultForbidden": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/defaultErrorResponse"
+            }
+          }
+        },
+        "description": "Действие запрещено"
+      },
+      "defaultInternalServerError": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/defaultErrorResponse"
+            }
+          }
+        },
+        "description": "Ошибка сервера"
+      },
+      "defaultNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/defaultErrorResponse"
+            }
+          }
+        },
+        "description": "Не найдено"
+      },
+      "defaultTooManyRequests": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/defaultErrorResponse"
+            }
+          }
+        },
+        "description": "Превышено количество запросов"
+      },
+      "defaultUnauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/defaultErrorResponse"
+            }
+          }
+        },
+        "description": "Требуется авторизация"
+      },
+      "forbiddenWithStatus": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "additionalProperties": false,
+              "properties": {
+                "result": {
+                  "$ref": "#/components/schemas/errorResult"
+                },
+                "status": {
+                  "$ref": "#/components/schemas/forbiddenResponseStatus"
+                }
+              },
+              "required": [
+                "status",
+                "result"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Действие запрещено"
+      },
+      "notFoundWithStatus": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "additionalProperties": false,
+              "properties": {
+                "result": {
+                  "$ref": "#/components/schemas/errorResult"
+                },
+                "status": {
+                  "$ref": "#/components/schemas/notFoundResponseStatus"
+                }
+              },
+              "required": [
+                "status",
+                "result"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Не найдено"
+      },
+      "unauthorizedWithStatus": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "additionalProperties": false,
+              "properties": {
+                "result": {
+                  "$ref": "#/components/schemas/errorResult"
+                },
+                "status": {
+                  "$ref": "#/components/schemas/unauthorizedResponseStatus"
+                }
+              },
+              "required": [
+                "status",
+                "result"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Требуется авторизация"
       },
       "GetCallById": {
         "content": {
@@ -54831,7 +56812,7 @@
       "x-displayName": "Персональная авторизация"
     },
     {
-      "description": "Для работы с API приложений от лица пользователя есть возможность получить токен через Authorization Code механизм протокола OAuth2. Для этого в первую очередь нужно зарегистрировать приложение на https://developers.avito.ru/applications. После успешной регистрации ваше приложение получит возможность работать с API Авито от лица пользователя (если последний выдаст на это разрешение).\n\nПодробнее об Authorization Code флоу протокола OAuth2 можно почитать [в статье](https://www.digitalocean.com/community/tutorials/oauth-2-ru). Процесс работы с этим флоу в API Авито отличается только незначительными деталями – ниже по шагам описан процесс интеграции.\n\n### Шаг 1: Регистрация приложения\n\nРегистрируем приложение через https://developers.avito.ru/application. Для регистрации нужно указать:\n\n* Имя приложения, которое будет выводиться пользователям в форме подтверждения прав\n* Redirect URI - адрес, на который сайт Авито средиректит пользователя после подтверждения прав\n* Скоупы, которые необходимы вашему приложению (подробнее о доступных скоупах ниже)\n* Описание приложения - для каких целей вы планируете использовать доступ к данным\n\nВ данный момент мы регистрируем только доверенные приложения от наших партнеров.\n\nСкоупы определяют права, на которые ваше приложение сможет рассчитывать после подверждения авторизации пользователем. Доступные скоупы:\n* messenger:read: Чтение сообщений в мессенджере Авито\n* messenger:write: Модифицирование сообщений в мессенджере Авито\n* user_balance:read: Получение баланса пользователя\n* job:write: Изменение объявлений вертикали Работа\n* job:cv: Получение информации резюме\n* job:vacancy: Работа с вакансиями\n* job:applications: Получение информации об откликах на вакансии\n* user_operations:read: Получение истории операций пользователя\n* user:read: Получение информации о пользователе\n* autoload:reports: Получение отчетов Автозагрузки\n* items:info: Получение информации об объявлениях\n* items:apply_vas: Применение дополнительных услуг\n* short_term_rent:read: Получение информации об объявлениях краткосрочной аренды\n* short_term_rent:write: Изменение объявлений краткосрочной аренды\n* stats:read: Получение статистики объявлений\n### Шаг 2: Ссылка с кодом авторизации\n\nСначала пользователю предоставляется ссылка следующего вида:\n\n```\nhttps://avito.ru/oauth?response_type=code&pro_users_flow=true&client_id=<CLIENT_ID>&scope=messenger:read,messenger:write\n```\n\n### Шаг 3: Пользователь авторизует приложение\n\nПользователь переходит по ссылке на Авито, аутентифицируется при необходимости, затем подтверждает выдачу необходимых прав вашему приложению.\n\n### Шаг 4: Приложение получает код авторизации\n\nЕсли пользователь выбирает \"Авторизовать приложение\", Авито перенаправляет пользовательский агент (браузер) по URI перенаправления (Redirect URI), который был задан на этапе регистрации приложения и добавляет в него параметр `code`. Например, если при регистрации в качестве Redirect URI был указан адрес `https://example.com/callback/avito`, то мы перенаправим пользователя на:\n\n```\nhttps://example.com/callback/avito?code=<AUTHORIZATION_CODE>\n```\n\n### Шаг 5: Приложение запрашивает токен доступа\n\nПриложение запрашивает токен доступа у API Авито путём отправки авторизационного кода и аутентификационной информации (включая секрет приложения). Ниже представлен пример POST-запроса для получения access token:\n\n```\n     curl -L -X POST 'https://api.avito.ru/token/' \\\n         -H 'Content-Type: application/x-www-form-urlencoded' \\\n         --data-urlencode 'grant_type=authorization_code' \\\n         --data-urlencode 'client_id=<CLIENT_ID>' \\\n         --data-urlencode 'client_secret=<CLIENT_SECRET>' \\\n         --data-urlencode 'code=<AUTHORIZATION_CODE>'\n```\n\n### Шаг 6: Приложение получает токен доступа\n\nЕсли авторизация прошла успешно, API возвращает токен доступа (а также токен для обновления токена доступа - refresh token). Весь ответ сервера может выглядеть следующим образом:\n\n```\n{\n    \"access_token\": \"<ACCESS_TOKEN>\",\n    \"expires_in\": 86400,\n    \"refresh_token\": \"<REFRESH_TOKEN>\",\n    \"scope\": \"messenger:read,messenger:write\",\n    \"token_type\": \"Bearer\"\n}\n```\n\nПриложение сохраняет access_token и refresh_token.\n\n### Шаг 7: Приложение делает запросы к API c токеном доступа\n\nДалее приложение может выполнять запросы к API с заголовком `Authorization: Bearer <ACCESS_TOKEN>`\n\n### Шаг 8: Приложение обновляет access_token\n\nВремя действия access token ограничено - 24 часа с момента его получения. После этого вам необходимо получить новый токен.\n\nПосле истечения срока действия токена доступа все запросы к API с его использованием будут возвращать код ошибки 403. Сохраненный refresh token может быть использован для получения нового токена доступа от авторизационного сервера.\n\nНиже представлен пример POST-запроса, использующего refresh token для обновления токена доступа:\n\n``` curl -L -X POST 'https://api.avito.ru/token/' \\\n    -H 'Content-Type: application/x-www-form-urlencoded' \\\n    --data-urlencode 'grant_type=refresh_token' \\\n    --data-urlencode 'client_id=<CLIENT_ID>' \\\n    --data-urlencode 'client_secret=<CLIENT_SECRET>' \\\n    --data-urlencode 'refresh_token=<REFRESH_TOKEN>'\n```\n\nВ ответ приложение получит точно такой же JSON, как и при обмене code на access token. При этом будет получен не только новый access_token, но и новый refresh_token. Обновите оба значения в своей базе данных.\n\n### Дополнительный параметр state\n\nДля того чтобы защитить данные пользователей мы крайне рекомендуем использовать параметр state. Этот параметр позволяет защититься от CSRF-атак и восстановить состояние вашего приложения на момент начала авторизации. Подробнее, зачем нужен параметр state, можно прочитать [тут](https://auth0.com/docs/protocols/oauth2/oauth-state).\n\nДля того, чтобы использовать state – просто включите его в начальный URL:\n\n```\nhttps://avito.ru/oauth?response_type=code&pro_users_flow=true&client_id=<CLIENT_ID>&scope=messenger:read,messenger:write&state=<STATE>\n```\n\nВ итоге state будет содержаться в финальном Redirect URI, на который Авито перенаправляет пользователя после подтверждения прав доступа. Например, если при регистрации в качестве Redirect URI был указан адрес `https://example.com/callback/avito`, то мы перенаправим пользователя на:\n\n```\nhttps://example.com/callback/avito?code=<AUTHORIZATION_CODE>&state=<STATE>\n```\n\nНе передавайте чувствительные данные в открытом виде в этом параметре. Генерируйте уникальное временное значение state в вашем приложении.\n",
+      "description": "Для работы с API приложений от лица пользователя есть возможность получить токен через Authorization Code механизм протокола OAuth2. Для этого в первую очередь нужно зарегистрировать приложение на https://developers.avito.ru/applications. После успешной регистрации ваше приложение получит возможность работать с API Авито от лица пользователя (если последний выдаст на это разрешение).\n\nПодробнее об Authorization Code флоу протокола OAuth2 можно почитать [в статье](https://www.digitalocean.com/community/tutorials/oauth-2-ru). Процесс работы с этим флоу в API Авито отличается только незначительными деталями – ниже по шагам описан процесс интеграции.\n\n### Шаг 1: Регистрация приложения\n\nРегистрируем приложение через https://developers.avito.ru/application. Для регистрации нужно указать:\n\n* Имя приложения, которое будет выводиться пользователям в форме подтверждения прав\n* Redirect URI - адрес, на который сайт Авито средиректит пользователя после подтверждения прав\n* Скоупы, которые необходимы вашему приложению (подробнее о доступных скоупах ниже)\n* Описание приложения - для каких целей вы планируете использовать доступ к данным\n\nВ данный момент мы регистрируем только доверенные приложения от наших партнеров.\n\nСкоупы определяют права, на которые ваше приложение сможет рассчитывать после подверждения авторизации пользователем. Доступные скоупы:\n* messenger:read: Чтение сообщений в мессенджере Авито\n* messenger:write: Модифицирование сообщений в мессенджере Авито\n* user_balance:read: Получение баланса пользователя\n* job:write: Изменение объявлений вертикали Работа\n* job:cv: Получение информации резюме\n* job:vacancy: Работа с вакансиями\n* job:applications: Получение информации об откликах на вакансии\n* user_operations:read: Получение истории операций пользователя\n* user:read: Получение информации о пользователе\n* autoload:reports: Получение отчетов Автозагрузки\n* items:info: Получение информации об объявлениях\n* items:apply_vas: Применение дополнительных услуг\n* short_term_rent:read: Получение информации об объявлениях краткосрочной аренды\n* short_term_rent:write: Изменение объявлений краткосрочной аренды\n* stats:read: Получение статистики объявлений\n\n### Шаг 2: Ссылка с кодом авторизации\n\nСначала пользователю предоставляется ссылка следующего вида:\n\n```\nhttps://avito.ru/oauth?response_type=code&pro_users_flow=true&client_id=<CLIENT_ID>&scope=messenger:read,messenger:write\n```\n\n### Шаг 3: Пользователь авторизует приложение\n\nПользователь переходит по ссылке на Авито, аутентифицируется при необходимости, затем подтверждает выдачу необходимых прав вашему приложению.\n\n### Шаг 4: Приложение получает код авторизации\n\nЕсли пользователь выбирает \"Авторизовать приложение\", Авито перенаправляет пользовательский агент (браузер) по URI перенаправления (Redirect URI), который был задан на этапе регистрации приложения и добавляет в него параметр `code`. Например, если при регистрации в качестве Redirect URI был указан адрес `https://example.com/callback/avito`, то мы перенаправим пользователя на:\n\n```\nhttps://example.com/callback/avito?code=<AUTHORIZATION_CODE>\n```\n\n### Шаг 5: Приложение запрашивает токен доступа\n\nПриложение запрашивает токен доступа у API Авито путём отправки авторизационного кода и аутентификационной информации (включая секрет приложения). Ниже представлен пример POST-запроса для получения access token:\n\n```\n     curl -L -X POST 'https://api.avito.ru/token/' \\\n         -H 'Content-Type: application/x-www-form-urlencoded' \\\n         --data-urlencode 'grant_type=authorization_code' \\\n         --data-urlencode 'client_id=<CLIENT_ID>' \\\n         --data-urlencode 'client_secret=<CLIENT_SECRET>' \\\n         --data-urlencode 'code=<AUTHORIZATION_CODE>'\n```\n\n### Шаг 6: Приложение получает токен доступа\n\nЕсли авторизация прошла успешно, API возвращает токен доступа (а также токен для обновления токена доступа - refresh token). Весь ответ сервера может выглядеть следующим образом:\n\n```\n{\n    \"access_token\": \"<ACCESS_TOKEN>\",\n    \"expires_in\": 86400,\n    \"refresh_token\": \"<REFRESH_TOKEN>\",\n    \"scope\": \"messenger:read,messenger:write\",\n    \"token_type\": \"Bearer\"\n}\n```\n\nПриложение сохраняет access_token и refresh_token.\n\n### Шаг 7: Приложение делает запросы к API c токеном доступа\n\nДалее приложение может выполнять запросы к API с заголовком `Authorization: Bearer <ACCESS_TOKEN>`\n\n### Шаг 8: Приложение обновляет access_token\n\nВремя действия access token ограничено - 24 часа с момента его получения. После этого вам необходимо получить новый токен.\n\nПосле истечения срока действия токена доступа все запросы к API с его использованием будут возвращать код ошибки 403. Сохраненный refresh token может быть использован для получения нового токена доступа от авторизационного сервера.\n\nНиже представлен пример POST-запроса, использующего refresh token для обновления токена доступа:\n\n``` curl -L -X POST 'https://api.avito.ru/token/' \\\n    -H 'Content-Type: application/x-www-form-urlencoded' \\\n    --data-urlencode 'grant_type=refresh_token' \\\n    --data-urlencode 'client_id=<CLIENT_ID>' \\\n    --data-urlencode 'client_secret=<CLIENT_SECRET>' \\\n    --data-urlencode 'refresh_token=<REFRESH_TOKEN>'\n```\n\nВ ответ приложение получит точно такой же JSON, как и при обмене code на access token. При этом будет получен не только новый access_token, но и новый refresh_token. Обновите оба значения в своей базе данных.\n\n### Дополнительный параметр state\n\nДля того чтобы защитить данные пользователей мы крайне рекомендуем использовать параметр state. Этот параметр позволяет защититься от CSRF-атак и восстановить состояние вашего приложения на момент начала авторизации. Подробнее, зачем нужен параметр state, можно прочитать [тут](https://auth0.com/docs/protocols/oauth2/oauth-state).\n\nДля того, чтобы использовать state – просто включите его в начальный URL:\n\n```\nhttps://avito.ru/oauth?response_type=code&pro_users_flow=true&client_id=<CLIENT_ID>&scope=messenger:read,messenger:write&state=<STATE>\n```\n\nВ итоге state будет содержаться в финальном Redirect URI, на который Авито перенаправляет пользователя после подтверждения прав доступа. Например, если при регистрации в качестве Redirect URI был указан адрес `https://example.com/callback/avito`, то мы перенаправим пользователя на:\n\n```\nhttps://example.com/callback/avito?code=<AUTHORIZATION_CODE>&state=<STATE>\n```\n\nНе передавайте чувствительные данные в открытом виде в этом параметре. Генерируйте уникальное временное значение state в вашем приложении.\n",
       "name": "ApplicationAccess",
       "x-displayName": "Авторизация для приложений"
     },
@@ -54900,6 +56881,40 @@
     {
       "name": "Автотека",
       "description": ""
+    },
+    {
+      "description": "С помощью API данного раздела вы можете узнать статус клиентов, проверив их ИНН.\nЗа клиентов в статусе «Новый» или «Аплифт» агентству выплачивается комиссия.\nПодробные правила указаны в соглашении о премировании.\n\n[Создайте](#operation/agencyClientsTargetCreate) задачу на проверку ИНН клиентов и получите её идентификатор.\nЗатем с помощью идентификатора [проверьте](#operation/agencyClientsTargetResult) её статус\n  и получите результаты проверки, если задача завершилась успешно.\n\n### Типы авторизации\n\nДля использования данного API запрос должен быть авторизован.\nAPI Авито Promo использует следующие механизмы авторизации:\n\n<!-- ReDoc-Inject: <security-definitions> -->\n",
+      "name": "targeting",
+      "x-displayName": "Проверка ИНН клиентов"
+    },
+    {
+      "description": "С помощью API данного раздела вы можете приглашать в агентство новых клиентов.\n\n[Отправьте](#operation/agencyUsersInviteSend) приглашение новому клиенту и получите идентификатор приглашения.\nЗатем по идентификатору:\n\n- [проверьте](#operation/agencyUsersInviteStatus) статус приглашения, чтобы понять,\n  было ли приглашение принято или отклонено клиентом;\n- [убедитесь](#operation/agencyUsersVerificationStatus),\n  что верификация рекламного аккаунта клиента прошла успешно (актуально для рекламной модели).\n\n### Типы авторизации\n\nДля использования данного API запрос должен быть авторизован.\nAPI Авито Promo использует следующие механизмы авторизации:\n\n<!-- ReDoc-Inject: <security-definitions> -->\n",
+      "name": "invite",
+      "x-displayName": "Приглашения новых клиентов"
+    },
+    {
+      "description": "С помощью API данного раздела вы можете получать актуальную информацию о клиентах агентства.\n\n### Типы авторизации\n\nДля использования данного API запрос должен быть авторизован.\nAPI Авито Promo использует следующие механизмы авторизации:\n\n<!-- ReDoc-Inject: <security-definitions> -->\n",
+      "name": "profile",
+      "x-displayName": "Кабинет агентства"
+    },
+    {
+      "description": "С помощью API данного раздела вы можете получать статистику по объявлениям и расходам клиентов.\n\n### Типы авторизации\n\nДля использования данного API запрос должен быть авторизован.\nAPI Авито Promo использует следующие механизмы авторизации:\n\n<!-- ReDoc-Inject: <security-definitions> -->\n",
+      "name": "statistics",
+      "x-displayName": "Статистика клиентов"
+    },
+    {
+      "description": "С помощью API данного раздела вы можете выполнять переводы средств клиентам и отслеживать транзакции.\n\n[Выполните](#operation/agencyBalance) перевод средств на счёт клиента и получите идентификатор транзакции.\nЗатем с помощью идентификатора [проверьте](#operation/agencyTransaction) статус транзакции.\n[Отслеживайте](#operation/agencyTransactions) транзакции, которые ещё не были завершены.\n\n### Типы авторизации\n\nДля использования данного API запрос должен быть авторизован.\nAPI Авито Promo использует следующие механизмы авторизации:\n\n<!-- ReDoc-Inject: <security-definitions> -->\n",
+      "name": "transactions",
+      "x-displayName": "Перевод средств клиентам"
+    },
+    {
+      "description": "С помощью API данного раздела вы можете получить информацию о балансе средств агентства и всех операций с ним.\n\n### Типы авторизации\n\nДля использования данного API запрос должен быть авторизован.\nAPI Авито Promo использует следующие механизмы авторизации:\n\n<!-- ReDoc-Inject: <security-definitions> -->\n",
+      "name": "balance",
+      "x-displayName": "Баланс агентства"
+    },
+    {
+      "name": "Авито Promo",
+      "description": "API для агентств Авито Promo"
     },
     {
       "description": "# API CallTracking-ceрвиса - это набор методов для получения информации о звонках.\nОписание API произведено в формате [**Swagger 3.0**](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md).\nВы можете использовать данный файл для ознакомления с методами API, а также для генерации базового кода для работы с API на удобном для вас языке программирования с помощью утилиты\n[**Swagger Codegen**](https://swagger.io/swagger-codegen/) или online сервиса [**Swagger Editor**](https://editor.swagger.io/).\n\n**Авито API для бизнеса предоставляется согласно [Условиям использования](https://api.avito.ru/docs/public/APITermsOfServiceV1.pdf).**\nПо всем вопросам работы с API необходимо обращаться в Службу Поддержки профессиональных инструментов:\n\n<li>телефон: <b>+7 495 777-10-66</b></li>\n<li>email: <a href=\"mailto:supportautoload@avito.ru\">supportautoload@avito.ru</a></li>\n\n# Типы авторизации\nДля использования данного API запрос должен быть авторизован. В данный момент API Авито использует следующие механизмы авторизации. <!-- ReDoc-Inject: <security-definitions> -->\n",

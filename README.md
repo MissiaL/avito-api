@@ -1,8 +1,8 @@
 # avito-api
 
-Agent Skill в формате [agentskills.io](https://agentskills.io) для работы с [Avito Business API](https://developers.avito.ru/api-catalog) — управление объявлениями, чатами Messenger, Авито.Доставка, Авито.Работа, Автозагрузка, Автотека, статистика, тарифы, CPA, продвижение и ещё ~20 разделов.
+Agent Skill в формате [agentskills.io](https://agentskills.io) для работы с [Avito Business API](https://developers.avito.ru/api-catalog) — управление объявлениями, чатами Messenger, Авито.Доставка, Авито.Работа, Автозагрузка, Автотека, Авито Promo, статистика, тарифы, CPA, продвижение, Авито Реклама и остальные разделы официального каталога.
 
-В коробке: полный официальный OpenAPI 3.0 спек (197 эндпоинтов / 23 раздела), родная per-section документация Avito, OAuth2-хелпер для токена, и CLI для поиска по спеку без необходимости тащить 1.7 МБ JSON в контекст.
+В коробке: полный официальный OpenAPI 3.0 спек (238 путей / 245 операций / 25 разделов), родная per-section документация Avito, OAuth2-хелпер для токена, и CLI для поиска по спеку без необходимости тащить ~2.0 МБ JSON в контекст.
 
 ## Структура
 
@@ -44,7 +44,7 @@ export AVITO_CLIENT_SECRET=...
 ### Что агент сделает дальше
 
 1. Прочитает [SKILL.md](SKILL.md), узнает про auth, base URL и навигацию.
-2. Через `lookup_endpoint.py search/show` найдёт нужный эндпоинт и его схему — без чтения 1.7 МБ JSON.
+2. Через `lookup_endpoint.py search/show` найдёт нужный эндпоинт и его схему — без чтения ~2.0 МБ JSON.
 3. На сложных интеграциях откроет `references/sections/<slug>.md` (например, `delivery-sandbox.md` — 200 КБ родного гайда от Avito).
 4. Запросит токен через `get_token.py`, дёрнет API, вернёт результат.
 

@@ -157,10 +157,15 @@ curl --request POST \
 Ответ:
 
 ```json
-{ "accountID": 998186750 }
+{
+  "accountID": 998186750,
+  "warnings": []
+}
 ```
 
 Сохраните `accountID` — это ID тестового аккаунта.
+
+Если аккаунт создан, но подготовка sandbox-данных выполнена не полностью, API вернёт `207 Multi-Status`. В поле `warnings` будут перечислены операции, которые не удалось выполнить: например, пополнение баланса, начисление бонусов или создание тестовых кампаний, групп и креативов.
 
 ### Шаг 2. Используйте sandbox-префикс в запросах
 
@@ -202,9 +207,10 @@ curl --request GET \
 
 ### Деньги и бонусы
 
-- Все денежные значения — **целые числа в рублях с НДС**.
+- Денежные значения без суффикса `Kopeks` — **целые числа в рублях с НДС**.
+- Поля с суффиксом `Kopeks` возвращают те же суммы в копейках.
 - Минимальная сумма перевода — **1 рубль/бонус**.
-- Поля `balance`, `bonusBalance`, `spend`, `spendBonus`, `budget`, `price`, `amount` — всегда целые.
+- Поля `balance`, `bonusBalance`, `spend`, `spendBonus`, `budget`, `price`, `amount`, а также `balanceKopeks`, `bonusBalanceKopeks`, `spendKopeks`, `spendBonusKopeks`, `budgetKopeks`, `priceKopeks`, `valueKopeks` — всегда целые.
 
 ### Даты и периоды
 
@@ -306,14 +312,18 @@ curl --request GET \
 ```json
 {
   "balance": 10000,
-  "bonusBalance": 0
+  "balanceKopeks": 1000000,
+  "bonusBalance": 0,
+  "bonusBalanceKopeks": 0
 }
 ```
 
 | Поле | Тип | Описание |
 |------|-----|----------|
 | `balance` | integer | Денежные средства, в рублях |
+| `balanceKopeks` | integer | Денежные средства, в копейках |
 | `bonusBalance` | integer | Бонусы, в рублях |
+| `bonusBalanceKopeks` | integer | Бонусы, в копейках |
 
 ### Дочерние аккаунты и переводы
 
@@ -382,7 +392,12 @@ curl --request GET \
   "children": [
     {
       "account": { "id": 987654321, "shortName": "Дочерний аккаунт" },
-      "balance": { "balance": 2500, "bonusBalance": 100 }
+      "balance": {
+        "balance": 2500,
+        "balanceKopeks": 250000,
+        "bonusBalance": 100,
+        "bonusBalanceKopeks": 10000
+      }
     }
   ]
 }
@@ -723,6 +738,7 @@ curl --request POST \
       "name": "Кампания 1",
       "status": "active",
       "budget": 100000,
+      "budgetKopeks": 10000000,
       "paymentModel": "CPC",
       "campaignType": "textImage",
       "startDate": "2025-01-01",
@@ -779,6 +795,36 @@ curl --request POST \
     "page": 1
   }'
 ```
+
+Ответ:
+
+```json
+{
+  "total": 1,
+  "groups": [
+    {
+      "id": 987654321,
+      "campaignID": 1234567890,
+      "name": "Группа 1",
+      "status": "active",
+      "budget": 2500,
+      "budgetKopeks": 250000,
+      "price": 25,
+      "priceKopeks": 2500,
+      "frequencyCount": 3,
+      "frequencyPeriod": "day",
+      "frequencyRules": [
+        { "count": 3, "period": "day" },
+        { "count": 10, "period": "week" }
+      ],
+      "pace": "asap",
+      "bannerFormat": "media"
+    }
+  ]
+}
+```
+
+`budget` и `price` возвращаются в рублях, `budgetKopeks` и `priceKopeks` — в копейках. `frequencyRules` содержит правила частотного ограничения. Если у группы нет явных правил частоты, вернётся `[{ "count": 0, "period": "no_limit" }]`.
 
 Доступные фильтры:
 
@@ -884,7 +930,9 @@ curl --request POST \
 | `clicks` | integer | Количество кликов |
 | `ctr` | number | CTR (Click-Through Rate) |
 | `spend` | integer | Потрачено денег, в рублях |
+| `spendKopeks` | integer | Потрачено денег, в копейках |
 | `spendBonus` | integer | Потрачено бонусов, в рублях |
+| `spendBonusKopeks` | integer | Потрачено бонусов, в копейках |
 | `cpm` | number | Средняя стоимость CPM |
 | `cpc` | number | Средняя стоимость CPC |
 | `videoViews25` | integer | Просмотров видео на 25% (для видео-кампаний) |
@@ -922,13 +970,13 @@ curl --request POST \
       {
         "timestamp": "2025-01-01T00:00:00Z",
         "views": 1000, "clicks": 50, "ctr": 5.0,
-        "spend": 1500, "spendBonus": 0,
+        "spend": 1500, "spendKopeks": 150000, "spendBonus": 0, "spendBonusKopeks": 0,
         "cpm": 150.0, "cpc": 3000.0
       }
     ],
     "totalData": {
       "views": 1000, "clicks": 50, "ctr": 5.0,
-      "spend": 1500, "spendBonus": 0,
+      "spend": 1500, "spendKopeks": 150000, "spendBonus": 0, "spendBonusKopeks": 0,
       "cpm": 150.0, "cpc": 3000.0
     }
   },
@@ -936,14 +984,14 @@ curl --request POST \
     {
       "id": 111222333, "name": "Группа 1",
       "data": [],
-      "totalData": { "views": 1000, "clicks": 50, "ctr": 5.0, "spend": 1500, "spendBonus": 0, "cpm": 150.0, "cpc": 3000.0 }
+      "totalData": { "views": 1000, "clicks": 50, "ctr": 5.0, "spend": 1500, "spendKopeks": 150000, "spendBonus": 0, "spendBonusKopeks": 0, "cpm": 150.0, "cpc": 3000.0 }
     }
   ],
   "creatives": [
     {
       "id": 444555666, "groupId": 111222333, "name": "Креатив 1",
       "data": [],
-      "totalData": { "views": 1000, "clicks": 50, "ctr": 5.0, "spend": 1500, "spendBonus": 0, "cpm": 150.0, "cpc": 3000.0 }
+      "totalData": { "views": 1000, "clicks": 50, "ctr": 5.0, "spend": 1500, "spendKopeks": 150000, "spendBonus": 0, "spendBonusKopeks": 0, "cpm": 150.0, "cpc": 3000.0 }
     }
   ]
 }
@@ -974,9 +1022,9 @@ curl --request POST \
       "id": 111222333,
       "name": "Группа 1",
       "data": [
-        { "timestamp": "2025-01-01T00:00:00Z", "views": 1000, "clicks": 50, "ctr": 5.0, "spend": 1500, "spendBonus": 0, "cpm": 150.0, "cpc": 3000.0 }
+        { "timestamp": "2025-01-01T00:00:00Z", "views": 1000, "clicks": 50, "ctr": 5.0, "spend": 1500, "spendKopeks": 150000, "spendBonus": 0, "spendBonusKopeks": 0, "cpm": 150.0, "cpc": 3000.0 }
       ],
-      "totalData": { "views": 1000, "clicks": 50, "ctr": 5.0, "spend": 1500, "spendBonus": 0, "cpm": 150.0, "cpc": 3000.0 }
+      "totalData": { "views": 1000, "clicks": 50, "ctr": 5.0, "spend": 1500, "spendKopeks": 150000, "spendBonus": 0, "spendBonusKopeks": 0, "cpm": 150.0, "cpc": 3000.0 }
     }
   ]
 }

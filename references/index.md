@@ -1,12 +1,12 @@
 # Avito API — индекс категорий
 
-Источник: официальный каталог `developers.avito.ru/api-catalog` (`/web/1/openapi/list` + `/web/1/openapi/info/<slug>`). Полный спек: [avito-api-openapi.json](./avito-api-openapi.json) (~1.9 МБ, 227 путей / 234 операций / 24 разделов).
+Источник: официальный каталог `developers.avito.ru/api-catalog` (`/web/1/openapi/list` + `/web/1/openapi/info/<slug>`). Полный спек: [avito-api-openapi.json](./avito-api-openapi.json) (~2.0 МБ, 238 путей / 245 операций / 25 разделов).
 
 Документация по разделам — в [sections/](./sections/) (интеграция, примеры, sandbox).
 
 **Не читай OpenAPI целиком.** Используй `scripts/lookup_endpoint.py` (`tags`/`search`/`show`).
 
-Категории отсортированы по числу эндпоинтов.
+Категории отсортированы по числу эндпоинтов. При коллизиях path+method канонический раздел — `x-avito-section`; остальные — `x-avito-also-in` в OpenAPI (и пометка «также публикует» ниже).
 
 ## Доставка (31) — [docs](./sections/delivery-sandbox.md)
 
@@ -197,6 +197,25 @@
 - `POST   /cpa/v2/chatsByTime` — Чаты по времени
 - `POST   /cpa/v3/balanceInfo` — Баланс
 
+## Авито Promo (11) — [docs](./sections/avito-promo.md)
+
+- `POST   /agency/balance` — Перевод средств на счёт клиента
+- `GET    /agency/transactions` — Получение списка незавершённых транзакций
+- `GET    /agency/transactions/{transaction_id}` — Получение информации о транзакции
+- `POST   /api/1/agency/clients` — Получение списка клиентов
+- `POST   /api/1/agency/clients/target/create` — Создание задачи на проверку ИНН клиентов
+- `POST   /api/1/agency/clients/target/result` — Получение результата проверки ИНН клиентов
+- `GET    /api/1/agency/finances/balance` — Получение баланса агентства
+- `POST   /api/1/agency/finances/transactionsHistory` — Получение всех операций с балансом агентства
+- `POST   /api/1/agency/users/invite/send` — Отправка приглашения нового клиента
+- `POST   /api/1/agency/users/invite/status` — Получение статуса приглашения нового клиента
+- `POST   /api/1/agency/users/verificationStatus` — Получение статуса верификации нового клиента
+
+Также публикует (канонический раздел другой; см. `x-avito-also-in`):
+
+- `POST   /stats/v2/accounts/{user_id}/items` — канон: Объявления
+- `POST   /stats/v2/accounts/{user_id}/spendings` — канон: Объявления
+
 ## Объявления (11) — [docs](./sections/item.md)
 
 - `POST   /core/v1/accounts/{userId}/vas/prices` — Получение информации о стоимости услуг продвижения и доступных значках
@@ -299,6 +318,10 @@
 
 - `POST   /token‎` — Получение access token
 - `POST   /token‎‎` — Обновление access token
+
+Также публикует (канонический раздел другой; см. `x-avito-also-in`):
+
+- `POST   /token` — канон: Автотека
 
 ## Аналитика по недвижимости (2)
 
