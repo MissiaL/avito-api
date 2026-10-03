@@ -1,8 +1,10 @@
 # Avito API — индекс категорий
 
-Источник: официальный каталог `developers.avito.ru/api-catalog` (`/web/1/openapi/list` + `/web/1/openapi/info/<slug>`). Полный спек: [avito-api-openapi.json](./avito-api-openapi.json) (~2.0 МБ, 238 путей / 245 операций / 25 разделов).
+Источник: официальный каталог `www.avito.ru/developers/api-catalog` (`/web/1/openapi/list` + `/web/1/openapi/info/<slug>`). Полный спек: [avito-api-openapi.json](./avito-api-openapi.json) (~2.2 МБ, 248 путей / 256 операций / 27 разделов).
 
-Документация по разделам — в [sections/](./sections/) (интеграция, примеры, sandbox).
+Схема выгружена **03.10.2026**. См. [источники](sources.md). Для Авито Реклама также доступны [официальные SDK](ads-sdk.md).
+
+Документация по разделам — в [sections/](./sections/) (интеграция, примеры, sandbox, история изменений).
 
 **Не читай OpenAPI целиком.** Используй `scripts/lookup_endpoint.py` (`tags`/`search`/`show`).
 
@@ -26,7 +28,7 @@
 - `POST   /delivery-sandbox/tariffs/sorting-center` — Загрузить сортировочные центры
 - `POST   /delivery-sandbox/tariffs/{tariff_id}/areas` — Загрузить области доставки
 - `POST   /delivery-sandbox/tariffs/{tariff_id}/tagged-sorting-centers` — Установка тэгов своим и/или чужим сортировочным центрам
-- `POST   /delivery-sandbox/tariffs/{tariff_id}/terminals` — Загрузить терминалы
+- `POST   /delivery-sandbox/tariffs/{tariff_id}/terminals` — Синхронизировать терминалы тарифа
 - `POST   /delivery-sandbox/tariffs/{tariff_id}/terms` — Обновить сроки по тарифу
 - `POST   /delivery-sandbox/tariffsV2` — Загрузить новый тариф v2
 - `GET    /delivery-sandbox/tasks/{task_id}` — Получение информации по задаче
@@ -42,60 +44,103 @@
 - `POST   /delivery/order/changeParcelResult` — Отправка результата исполнения заявки
 - `POST   /sandbox/changeParcels` — Обновление свойств посылок
 
-## Автотека (27) — [docs](./sections/autoteka.md)
+## Автотека (26) — [docs](./sections/autoteka.md)
 
 - `POST   /autoteka/v1/catalogs/resolve` — Получение актуальных параметров Автокаталога
+
 - `POST   /autoteka/v1/get-leads/` — Получение событий сервиса Сигнал
+
 - `POST   /autoteka/v1/monitoring/bucket/add` — Добавить идентификаторы (vin/frame) на мониторинг
+
 - `POST   /autoteka/v1/monitoring/bucket/delete` — Полная очистка списка мониторинга
+
 - `POST   /autoteka/v1/monitoring/bucket/remove` — Удаление идентификаторов из мониторинга (vin/frame)
+
 - `GET    /autoteka/v1/monitoring/get-reg-actions/` — Получение событий мониторинга
+
 - `GET    /autoteka/v1/packages/active_package` — Запрос остатка отчётов пользователя
+
 - `POST   /autoteka/v1/previews` — Превью по VIN или номеру кузова
+
 - `GET    /autoteka/v1/previews/{previewId}` — Получение превью по его ID
+
 - `POST   /autoteka/v1/reports` — Отчет по превью
+
 - `POST   /autoteka/v1/reports-by-vehicle-id` — Отчет по идентификатору авто (vin/frame)
+
 - `GET    /autoteka/v1/reports/list/` — Получение списка отчётов
+
 - `GET    /autoteka/v1/reports/{report_id}` — Получение отчета по его ID
+
 - `POST   /autoteka/v1/request-preview-by-external-item` — Превью по ID объявления другой площадки
+
 - `POST   /autoteka/v1/request-preview-by-item-id` — Превью по ID объявления Авито
 - `POST   /autoteka/v1/request-preview-by-regnumber` — Превью по государственному номеру
+
 - `POST   /autoteka/v1/scoring/by-vehicle-id` — Скоринг рисков по идентификатору авто (vin/frame)
+
 - `GET    /autoteka/v1/scoring/{scoring_id}` — Получение скоринга рисков по его ID
+
 - `POST   /autoteka/v1/specifications/by-plate-number` — Запрос характеристик по регистрационному номеру
+
 - `POST   /autoteka/v1/specifications/by-vehicle-id` — Запрос характеристик по идентификатору авто (vin/frame)
+
 - `GET    /autoteka/v1/specifications/specification/{specificationID}` — Получение характеристик по ID запроса
+
 - `POST   /autoteka/v1/sync/create-by-regnumber` — Синхронное создание отчета по ГРЗ
+
 - `POST   /autoteka/v1/sync/create-by-vin` — Синхронное создание отчёта по VIN или номеру кузова
+
 - `POST   /autoteka/v1/teasers` — Тизер по идентификатору авто (vin/frame)
+
 - `GET    /autoteka/v1/teasers/{teaser_id}` — Получение тизера по ID тизера
+
 - `POST   /autoteka/v1/valuation/by-specification` — Получение оценки по параметрам
-- `POST   /token` — Получение access token
+
+
+Также публикует (канонический раздел другой; см. `x-avito-also-in`):
+
+- `POST   /token` — канон: Авторизация
 
 ## Авито.Работа (25) — [docs](./sections/job.md)
 
 - `POST   /job/v1/applications/apply_actions` — Батчевая смена статуса откликов
+
 - `POST   /job/v1/applications/get_by_ids` — Получение списка откликов
+
 - `GET    /job/v1/applications/get_ids` — Получение идентификаторов откликов
+
 - `GET    /job/v1/applications/get_states` — Получение списка возможных статусов откликов
+
 - `POST   /job/v1/applications/set_is_viewed` — Изменение статуса отклика
-- `DELETE /job/v1/applications/webhook` — Отключение уведомлений по откликам (webhook)
+
 - `GET    /job/v1/applications/webhook` — Получение информации о подписках (webhook)
+
 - `PUT    /job/v1/applications/webhook` — Включение уведомлений по откликам (webhook)
+
+- `DELETE /job/v1/applications/webhook` — Отключение уведомлений по откликам (webhook)
+
 - `GET    /job/v1/applications/webhooks` — Получение списка подписок (webhook)
+
 - `GET    /job/v1/resumes/` — Поиск резюме
+
 - `GET    /job/v1/resumes/{resume_id}/contacts/` — Доступ к контактным данным соискателя
+
 - `POST   /job/v1/vacancies` — Публикация вакансии
 - `PUT    /job/v1/vacancies/archived/{vacancy_id}` — Остановка публикации вакансии
 - `PUT    /job/v1/vacancies/{vacancy_id}` — Редактирование вакансии
 - `POST   /job/v1/vacancies/{vacancy_id}/prolongate` — Реактивация вакансии
 - `GET    /job/v2/resumes/{resume_id}` — Просмотр данных резюме
+
 - `GET    /job/v2/vacancies` — Поиск вакансий
+
 - `POST   /job/v2/vacancies` — Публикация вакансии v2
 - `POST   /job/v2/vacancies/batch` — Просмотр данных вакансий
+
 - `POST   /job/v2/vacancies/statuses` — Получение статуса публикации вакансий V2
 - `POST   /job/v2/vacancies/update/{vacancy_uuid}` — Редактирование вакансии v2
 - `GET    /job/v2/vacancies/{vacancy_id}` — Просмотр данных вакансии
+
 - `PUT    /job/v2/vacancies/{vacancy_uuid}/auto_renewal` — Автопродление вакансии v2
 - `GET    /job/v2/vacancy/dict` — Получение списка доступных словарей
 - `GET    /job/v2/vacancy/dict/{dictionary_id}` — Получение доступных значений списка по ID словаря
@@ -129,8 +174,8 @@
 
 ## Автозагрузка (22) — [docs](./sections/autoload.md)
 
-- `GET    /autoload/v1/profile` — Получение профиля пользователя автозагрузки (deprecated) ⚠️ deprecated
-- `POST   /autoload/v1/profile` — Создание/редактирование настроек профиля пользователя автозагрузки (deprecated) ⚠️ deprecated
+- `GET    /autoload/v1/profile` — Получение профиля пользователя автозагрузки (deprecated)
+- `POST   /autoload/v1/profile` — Создание/редактирование настроек профиля пользователя автозагрузки (deprecated)
 - `POST   /autoload/v1/upload` — Загрузка файла по ссылке
 - `GET    /autoload/v1/user-docs/node/{node_slug}/fields` — Получения полей категории
 - `GET    /autoload/v1/user-docs/tree` — Получение дерева категорий
@@ -138,14 +183,14 @@
 - `GET    /autoload/v2/items/avito_ids` — ID объявлений на Авито
 - `GET    /autoload/v2/profile` — Получение профиля пользователя автозагрузки
 - `POST   /autoload/v2/profile` — Создание/редактирование настроек профиля пользователя автозагрузки
-- `GET    /autoload/v2/reports` — Список отчётов автозагрузки (deprecated) ⚠️ deprecated
-- `GET    /autoload/v2/reports/items` — Объявления по ID в автозагрузке (deprecated) ⚠️ deprecated
-- `GET    /autoload/v2/reports/last_completed_report` — Статистика по последней выгрузке (deprecated) ⚠️ deprecated
-- `GET    /autoload/v2/reports/{report_id}` — Статистика по конкретной выгрузке (deprecated) ⚠️ deprecated
-- `GET    /autoload/v2/reports/{report_id}/items` — Все объявления из конкретной выгрузки (deprecated) ⚠️ deprecated
-- `GET    /autoload/v2/reports/{report_id}/items/fees` — Списания за объявления в конкретной выгрузке (deprecated) ⚠️ deprecated
-- `GET    /autoload/v3/reports/last_completed_report` — Статистика по последней выгрузке (deprecated) ⚠️ deprecated
-- `GET    /autoload/v3/reports/{report_id}` — Статистика по конкретной выгрузке (deprecated) ⚠️ deprecated
+- `GET    /autoload/v2/reports` — Список отчётов автозагрузки (deprecated)
+- `GET    /autoload/v2/reports/items` — Объявления по ID в автозагрузке (deprecated)
+- `GET    /autoload/v2/reports/last_completed_report` — Статистика по последней выгрузке (deprecated)
+- `GET    /autoload/v2/reports/{report_id}` — Статистика по конкретной выгрузке (deprecated)
+- `GET    /autoload/v2/reports/{report_id}/items` — Все объявления из конкретной выгрузки (deprecated)
+- `GET    /autoload/v2/reports/{report_id}/items/fees` — Списания за объявления в конкретной выгрузке (deprecated)
+- `GET    /autoload/v3/reports/last_completed_report` — Статистика по последней выгрузке (deprecated)
+- `GET    /autoload/v3/reports/{report_id}` — Статистика по конкретной выгрузке (deprecated)
 - `GET    /autoload/v4/uploads` — История загрузок
 - `GET    /autoload/v4/uploads/current` — Текущая загрузка
 - `GET    /autoload/v4/uploads/current/items` — Объявления текущей загрузки
@@ -185,14 +230,14 @@
 
 ## CPA Авито (11) — [docs](./sections/cpa.md)
 
-- `GET    /cpa/v1/call/{call_id}` — Запись звонка (deprecated) ⚠️ deprecated
+- `GET    /cpa/v1/call/{call_id}` — Запись звонка (deprecated)
 - `GET    /cpa/v1/chatByActionId/{actionId}` — Чат
 - `POST   /cpa/v1/chatsByTime` — Чаты по времени (deprecated)
 - `POST   /cpa/v1/createComplaint` — Создание жалобы для звонков
 - `POST   /cpa/v1/createComplaintByActionId` — Создание жалобы для звонков/чатов
 - `POST   /cpa/v1/phonesInfoFromChats` — Информация по номерам телефонов из целевых чатов
-- `POST   /cpa/v2/balanceInfo` — Баланс (deprecated) ⚠️ deprecated
-- `POST   /cpa/v2/callById` — Звонок ⚠️ deprecated
+- `POST   /cpa/v2/balanceInfo` — Баланс (deprecated)
+- `POST   /cpa/v2/callById` — Звонок
 - `POST   /cpa/v2/callsByTime` — Звонки по времени
 - `POST   /cpa/v2/chatsByTime` — Чаты по времени
 - `POST   /cpa/v3/balanceInfo` — Баланс
@@ -213,6 +258,8 @@
 
 Также публикует (канонический раздел другой; см. `x-avito-also-in`):
 
+- `GET    /core/v1/accounts/{user_id}/items/{item_id}/` — канон: Объявления
+- `GET    /core/v1/items` — канон: Объявления
 - `POST   /stats/v2/accounts/{user_id}/items` — канон: Объявления
 - `POST   /stats/v2/accounts/{user_id}/spendings` — канон: Объявления
 
@@ -224,11 +271,35 @@
 - `PUT    /core/v1/accounts/{user_id}/items/{item_id}/vas` — Применение дополнительных услуг
 - `GET    /core/v1/items` — Получение информации по объявлениям
 - `POST   /core/v1/items/{item_id}/update_price` — Обновление цены объявления
+
 - `PUT    /core/v2/accounts/{user_id}/items/{item_id}/vas_packages` — Применение пакета дополнительных услуг
 - `PUT    /core/v2/items/{itemId}/vas/` — Применение услуг продвижения
 - `POST   /stats/v1/accounts/{user_id}/items` — Получение статистики по списку объявлений
 - `POST   /stats/v2/accounts/{user_id}/items` — Получение статистических показателей по профилю
 - `POST   /stats/v2/accounts/{user_id}/spendings` — Получение статистики расходов профиля
+
+## Цифровые товары (9) — [docs](./sections/digital-goods.md)
+
+- `GET    /digital-goods/v1/orders` — Список заказов
+- `GET    /digital-goods/v1/orders/{order_id}` — Заказ по идентификатору
+- `POST   /digital-goods/v1/orders/{order_id}/cancel` — Отмена заказа продавцом
+- `POST   /digital-goods/v1/orders/{order_id}/escalate-to-arbitration` — Эскалация спора в арбитраж
+- `GET    /digital-goods/v1/orders/{order_id}/history` — История статусов заказа
+- `POST   /digital-goods/v1/orders/{order_id}/payout` — Ссылка на вывод средств по заказу
+- `POST   /digital-goods/v1/orders/{order_id}/send` — Отправка цифрового товара покупателю
+- `POST   /digital-goods/v1/webhook` — Подписка на уведомления по заказам
+- `DELETE /digital-goods/v1/webhook` — Отписка от уведомлений по заказам
+
+## Продвижение (8) — [docs](./sections/promotion.md)
+
+- `POST   /promotion/v1/items/services/bbip/forecasts/get` — BBIP. Прогноз продвижения
+- `PUT    /promotion/v1/items/services/bbip/orders/create` — BBIP. Подключение услуги продвижения
+- `POST   /promotion/v1/items/services/bbip/suggests/get` — BBIP. Варианты бюджета продвижения
+- `POST   /promotion/v1/items/services/dict` — Словарь типов услуг продвижения
+- `POST   /promotion/v1/items/services/get` — Список услуг продвижения
+- `POST   /promotion/v1/items/services/orders/get` — Список заявок
+- `POST   /promotion/v1/items/services/orders/status` — Статус заявки
+- `POST   /promotion/v2/items/services/get` — Список услуг продвижения
 
 ## Автостратегия (7) — [docs](./sections/autostrategy.md)
 
@@ -242,35 +313,28 @@
 
 ## Иерархия Аккаунтов (7) — [docs](./sections/accounts-hierarchy.md)
 
-- `GET    /checkAhUserV1` — Получение информации о статусе пользователя в ИА ⚠️ deprecated
+- `GET    /checkAhUserV1` — Получение информации о статусе пользователя в ИА
 - `GET    /checkAhUserV2` — Получение информации о статусе пользователя в ИА
 - `GET    /getAhInfoV1` — Получение полной информации о статусе пользователя в ИА
 - `GET    /getEmployeesV1` — Получение списка сотрудников иерархии
-- `POST   /linkItemsV1` — Прикрепление сотрудника иерархии к объявлениям, перезакрепление объявлений между сотруд…
+- `POST   /linkItemsV1` — Прикрепление сотрудника иерархии к объявлениям, перезакрепление объявлений между сотрудниками иерархии
 - `GET    /listCompanyPhonesV1` — Получение списка телефонов компании
 - `POST   /listItemsByEmployeeIdV1` — Получение списка объявлений по сотруднику
-
-## Продвижение (7) — [docs](./sections/promotion.md)
-
-- `POST   /promotion/v1/items/services/bbip/forecasts/get` — BBIP. Прогноз продвижения
-- `PUT    /promotion/v1/items/services/bbip/orders/create` — BBIP. Подключение услуги продвижения
-- `POST   /promotion/v1/items/services/bbip/suggests/get` — BBIP. Варианты бюджета продвижения
-- `POST   /promotion/v1/items/services/dict` — Словарь типов услуг продвижения
-- `POST   /promotion/v1/items/services/get` — Список услуг продвижения
-- `POST   /promotion/v1/items/services/orders/get` — Список заявок
-- `POST   /promotion/v1/items/services/orders/status` — Статус заявки
 
 ## Краткосрочная аренда (5) — [docs](./sections/str.md)
 
 - `POST   /core/v1/accounts/{user_id}/items/{item_id}/bookings` — Заполнение календаря занятости объекта недвижимости
 - `GET    /realty/v1/accounts/{user_id}/items/{item_id}/bookings` — Получение списка броней по объявлению
+
 - `POST   /realty/v1/accounts/{user_id}/items/{item_id}/prices` — Актуализация параметров для выбранных периодов
+
 - `POST   /realty/v1/items/intervals` — Заполнение доступности объекта недвижимости с квотами и без
 - `POST   /realty/v1/items/{item_id}/base` — Установка базовых параметров
 
+
 ## Настройка цены целевого действия (5) — [docs](./sections/cpxpromo.md)
 
-- `GET    /cpxpromo/1/getBids/{itemId}` — Получение детализированной информации о действующих и доступных ценах за целевые действ…
+- `GET    /cpxpromo/1/getBids/{itemId}` — Получение детализированной информации о действующих и доступных ценах за целевые действия и бюджетах
 - `POST   /cpxpromo/1/getPromotionsByItemIds` — Получение текущих цен за целевое действие и бюджетов по нескольким объявлениям
 - `POST   /cpxpromo/1/remove` — Остановка продвижения
 - `POST   /cpxpromo/1/setAuto` — Применение автоматической настройки
@@ -303,6 +367,12 @@
 - `POST   /trx-promo/1/cancel` — Остановка продвижения
 - `GET    /trx-promo/1/commissions` — Проверка доступности продвижения и размера комиссий
 
+## Авторизация (3) — [docs](./sections/auth.md)
+
+- `POST   /token` — Получение access token
+- `POST   /token‎` — Получение access token
+- `POST   /token‎‎` — Обновление access token
+
 ## Информация о пользователе (3) — [docs](./sections/user.md)
 
 - `POST   /core/v1/accounts/operations_history/` — Получение истории операций пользователя
@@ -314,15 +384,6 @@
 - `GET    /auction/1/bids` — Получение информации о действующих и доступных ставках
 - `POST   /auction/1/bids` — Сохранение новых ставок
 
-## Авторизация (2) — [docs](./sections/auth.md)
-
-- `POST   /token‎` — Получение access token
-- `POST   /token‎‎` — Обновление access token
-
-Также публикует (канонический раздел другой; см. `x-avito-also-in`):
-
-- `POST   /token` — канон: Автотека
-
 ## Аналитика по недвижимости (2)
 
 - `GET    /realty/v1/marketPriceCorrespondence/{itemId}/{price}` — Получение соответствия переданной цены рыночной цене
@@ -332,6 +393,10 @@
 
 - `POST   /stock-management/1/info` — Получение остатков
 - `PUT    /stock-management/1/stocks` — Редактирование остатков
+
+## Тариф (1) — [docs](./sections/tariff-composition.md)
+
+- `GET    /api/1/partner/tariff/info` — Информация о текущем тарифе пользователя
 
 ## Тарифы (1) — [docs](./sections/tariff.md)
 

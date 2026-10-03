@@ -67,7 +67,7 @@
 - Почта, на которую будут приходить отчеты о загрузках
 
 ***createOrUpdateProfile*** (deprecated)
-Предназначен для создания и управления профилем автозагрузки. Если профиля еще не существует - через этот метод можно его создать.
+Предназначен для создания и управления профилем автозагрузки. Если профиля еще не существует - через этот метод можно его создать. 
 Если профиль существует - через этот метод можно управлять следующими настройками:
 
 - Статус автозагрузки (вкл/выкл)
@@ -137,3 +137,34 @@
 
 ***getCurrentUploadItems***
 Возвращает объявления [текущей загрузки](#operation/getCurrentUpload).
+
+---
+
+## История изменений
+
+### 2026-06-08
+
+Добавлены методы для получения информации по загрузкам Автозагрузки:
+
+- `/autoload/v4/uploads` — история загрузок
+- `/autoload/v4/uploads/current` — текущая загрузка
+- `/autoload/v4/uploads/current/items` — объявления текущей загрузки
+- `/autoload/v4/uploads/last_successful` — последняя успешно завершённая загрузка
+- `/autoload/v4/uploads/last_successful/items` — объявления последней успешно завершённой загрузки
+
+#### Deprecated
+
+Методы для работы с отчётами помечены `deprecated` и будут постепенно выведены из эксплуатации. Подробнее об этом читайте в [плане миграции](/api-catalog/autoload/documentation#migration-v4).
+
+Полный список устаревших методов:
+
+- `/autoload/v2/reports`
+- `/autoload/v2/reports/{report_id}`
+- `/autoload/v2/reports/last_completed_report`
+- `/autoload/v2/reports/items`
+- `/autoload/v2/reports/{report_id}/items`
+- `/autoload/v2/reports/{report_id}/items/fees`
+- `/autoload/v3/reports/{report_id}`
+- `/autoload/v3/reports/last_completed_report`
+
+Эти методы будут полностью отключены через 9 месяцев — 08.03.2027
