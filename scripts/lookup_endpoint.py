@@ -135,13 +135,25 @@ def cmd_show(spec: dict, args) -> int:
             "description": op.get("description"),
             "tags": op.get("tags"),
             "operationId": op.get("operationId"),
-            "security": op.get("security"),
+            "deprecated": op.get("deprecated", False),
+            "servers": op.get("servers", methods.get("servers", spec.get("servers", []))),
+            "security": op.get("security", spec.get("security", [])),
+            "securitySchemes": {
+                name: spec.get("components", {}).get("securitySchemes", {}).get(name)
+                for requirement in op.get("security", spec.get("security", []))
+                for name in requirement
+            },
+            "x-avito-section": op.get("x-avito-section"),
+            "x-avito-also-in": op.get("x-avito-also-in"),
             "x-rate-limiter": op.get("x-rate-limiter"),
             "parameters": merge_params(op.get("parameters")),
             "requestBody": deref_one_level(spec, op.get("requestBody")),
             "responses": deref_one_level(spec, op.get("responses", {})),
         }
         out["operations"][m.upper()] = op_resolved
+    if not out["operations"]:
+        print(f"method not found: {args.method} {path}", file=sys.stderr)
+        return 2
     print(json.dumps(out, ensure_ascii=False, indent=2))
     return 0
 
@@ -170,7 +182,7 @@ def main() -> int:
 
     p_show = sub.add_parser("show", help="show full details of an endpoint")
     p_show.add_argument("path", help="exact path or unique substring, e.g. /messenger/v2/accounts/{user_id}/chats")
-    p_show.add_argument("--method", help="get/post/put/delete/patch (default: all defined for this path)")
+    p_show.add_argument("--method", type=str.lower, choices=("get", "post", "put", "delete", "patch"), help="HTTP method (default: all defined for this path)")
 
     sub.add_parser("tags", help="list all tags with endpoint counts")
 

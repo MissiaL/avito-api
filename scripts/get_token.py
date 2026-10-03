@@ -4,8 +4,8 @@
 Usage:
     AVITO_CLIENT_ID=... AVITO_CLIENT_SECRET=... python3 get_token.py
 
-Prints the access_token to stdout. Token TTL is 24h; cache it yourself if you
-make many calls. Avito returns 401 for expired tokens — refresh and retry.
+Prints the access_token to stdout. Cache according to expires_in (available
+with --json). Avito returns 401 for expired tokens — refresh and retry once.
 """
 import json
 import os
