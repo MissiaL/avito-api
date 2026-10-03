@@ -6,6 +6,7 @@ import unittest
 from types import SimpleNamespace
 
 from lookup_endpoint import cmd_show, load_spec
+from build_spec import build, DEFAULT_SERVER
 
 
 class LookupChecks(unittest.TestCase):
@@ -49,6 +50,51 @@ class LookupChecks(unittest.TestCase):
         self.assertEqual(op["servers"], [{"url": "https://operation.example"}])
         self.assertEqual(op["security"], [])
         self.assertEqual(op["securitySchemes"], {})
+
+    def test_product_token_hosts(self):
+        spec = load_spec()
+        _, output = self.show(spec, "/api/1/partner/tariff/info")
+        business = output["operations"]["GET"]["securitySchemes"]["ClientCredentials"]
+        self.assertEqual(business["flows"]["clientCredentials"]["tokenUrl"], "https://api.avito.ru/token")
+        autoteka_path = next(path for path, item in spec["paths"].items()
+                             if item.get("get", {}).get("x-avito-section", {}).get("slug") == "autoteka")
+        _, output = self.show(spec, autoteka_path)
+        op = output["operations"]["GET"]
+        self.assertEqual(op["servers"], [{"url": "https://pro.autoteka.ru"}])
+        self.assertEqual(op["security"], [{"ClientCredentials__autoteka": []}])
+        autoteka = op["securitySchemes"]["ClientCredentials__autoteka"]
+        self.assertEqual(autoteka["flows"]["clientCredentials"]["tokenUrl"], "https://pro.autoteka.ru/token")
+
+    def test_all_security_requirements_resolve(self):
+        spec = load_spec()
+        schemes = spec["components"]["securitySchemes"]
+        for path, item in spec["paths"].items():
+            for method in ("get", "post", "put", "patch", "delete"):
+                for requirement in item.get(method, {}).get("security", []):
+                    for name in requirement:
+                        self.assertIn(name, schemes, f"{method.upper()} {path}: {name}")
+
+    def test_build_keeps_auth_hosts_and_normalizes_source_typo(self):
+        sections = []
+        for slug, server, requirement in (
+            ("autoteka", "https://pro.autoteka.ru", "ClientCredentials"),
+            ("auth", DEFAULT_SERVER, "ClientCredentials"),
+            ("autostrategy", DEFAULT_SERVER, "Client Credentials"),
+        ):
+            sections.append({"slug": slug, "title": slug, "server": server, "spec": {
+                "paths": {f"/{slug}": {"get": {"security": [{requirement: []}]}}},
+                "components": {"securitySchemes": {"ClientCredentials": {
+                    "type": "oauth2", "flows": {"clientCredentials": {"tokenUrl": server + "/token", "scopes": {}}}
+                }}},
+            }})
+        spec, _ = build(sections, "2026-10-03")
+        for slug, expected in (("autoteka", "https://pro.autoteka.ru/token"), ("auth", DEFAULT_SERVER + "/token")):
+            op = spec["paths"][f"/{slug}"]["get"]
+            name = next(iter(op["security"][0]))
+            self.assertEqual(spec["components"]["securitySchemes"][name]["flows"]["clientCredentials"]["tokenUrl"], expected)
+        op = spec["paths"]["/autostrategy"]["get"]
+        self.assertEqual(op["security"], [{"ClientCredentials": []}])
+        self.assertEqual(op["x-avito-original-security"], [{"Client Credentials": []}])
 
 
 if __name__ == "__main__":

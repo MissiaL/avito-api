@@ -12,8 +12,11 @@ Merge rules:
   So api.avito.ru sections beat e.g. Autoteka for the shared `/token`.
 - A component whose name is already taken with different content is renamed to
   `<name>__<slug>` and that section's `$ref`s are rewritten, so schemas never get mixed.
-- securitySchemes are shared by name; OAuth2 scopes are unioned.
+- securitySchemes of non-default hosts are namespaced as <name>__<slug>, with
+  security requirements and refs rewritten; OAuth2 scopes on the same host are unioned.
 - Operations of a non-default host get an operation-level `servers`.
+- autostrategy's undefined "Client Credentials" requirement is normalized to
+  its declared ClientCredentials scheme; the original is retained on the operation.
 """
 import argparse
 import datetime
@@ -46,6 +49,29 @@ def load_sections(dump):
 
 
 def merge_components(merged, sec):
+    if sec["server"] != DEFAULT_SERVER:
+        schemes = sec["spec"].get("components", {}).get("securitySchemes", {})
+        names = {name: f"{name}__{sec['slug']}" for name in schemes}
+
+        def rewrite_security(value):
+            if isinstance(value, dict):
+                for key, item in value.items():
+                    if key == "security":
+                        value[key] = [{names.get(name, name): scopes for name, scopes in req.items()}
+                                      for req in item]
+                    elif key == "$ref" and item.startswith("#/components/securitySchemes/"):
+                        name = item.rsplit("/", 1)[1]
+                        value[key] = f"#/components/securitySchemes/{names.get(name, name)}"
+                    else:
+                        rewrite_security(item)
+            elif isinstance(value, list):
+                for item in value:
+                    rewrite_security(item)
+
+        rewrite_security(sec["spec"])
+        if schemes:
+            sec["spec"]["components"]["securitySchemes"] = {names[name]: value for name, value in schemes.items()}
+
     for name, value in sec["spec"].get("components", {}).get("securitySchemes", {}).items():
         target = merged.setdefault("securitySchemes", {})
         if name not in target:
@@ -96,6 +122,10 @@ def build(sections, fetched):
                     target[key] = value
                     continue
                 op = dict(value)
+                if sec["slug"] == "autostrategy" and any("Client Credentials" in req for req in op.get("security", [])):
+                    op["x-avito-original-security"] = op["security"]
+                    op["security"] = [{("ClientCredentials" if name == "Client Credentials" else name): scopes
+                                       for name, scopes in req.items()} for req in op["security"]]
                 op["tags"] = list(dict.fromkeys(op.get("tags", []) + [sec["title"]]))
                 if sec["server"] != DEFAULT_SERVER:
                     op["servers"] = [{"url": sec["server"]}]
@@ -114,7 +144,10 @@ def build(sections, fetched):
                            "www.avito.ru/developers/api-catalog. Каждая операция получила тег с русским названием раздела "
                            "и поле x-avito-section. При коллизиях path+method канонический раздел — последний по порядку "
                            "(сначала разделы с нестандартным хостом, затем sorted(slug)); проигравшие указаны в x-avito-also-in. "
-                           "Одноимённые компоненты с разным содержимым переименованы в <name>__<slug>.",
+                           "Одноимённые компоненты с разным содержимым переименованы в <name>__<slug>. "
+                           "Схемы авторизации нестандартных хостов также разделены по slug. "
+                           "Опечатка Client Credentials в autostrategy исправлена на ClientCredentials; "
+                           "исходное требование сохранено в x-avito-original-security.",
             "contact": {"email": "supportautoload@avito.ru"},
             "termsOfService": "https://www.avito.ru/legal/pro_tools/public-api",
             "x-catalog-fetched": fetched,

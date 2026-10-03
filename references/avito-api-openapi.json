@@ -3,7 +3,7 @@
   "info": {
     "title": "Avito API для бизнеса (официальный каталог)",
     "version": "2026-10-03",
-    "description": "Полный спек Avito Business API, собранный scripts/build_spec.py из официального каталога www.avito.ru/developers/api-catalog. Каждая операция получила тег с русским названием раздела и поле x-avito-section. При коллизиях path+method канонический раздел — последний по порядку (сначала разделы с нестандартным хостом, затем sorted(slug)); проигравшие указаны в x-avito-also-in. Одноимённые компоненты с разным содержимым переименованы в <name>__<slug>.",
+    "description": "Полный спек Avito Business API, собранный scripts/build_spec.py из официального каталога www.avito.ru/developers/api-catalog. Каждая операция получила тег с русским названием раздела и поле x-avito-section. При коллизиях path+method канонический раздел — последний по порядку (сначала разделы с нестандартным хостом, затем sorted(slug)); проигравшие указаны в x-avito-also-in. Одноимённые компоненты с разным содержимым переименованы в <name>__<slug>. Схемы авторизации нестандартных хостов также разделены по slug. Опечатка Client Credentials в autostrategy исправлена на ClientCredentials; исходное требование сохранено в x-avito-original-security.",
     "contact": {
       "email": "supportautoload@avito.ru"
     },
@@ -7278,13 +7278,18 @@
         },
         "security": [
           {
-            "Client Credentials": []
+            "ClientCredentials": []
           }
         ],
         "summary": "Расчет бюджета кампании",
         "tags": [
           "Autostrategy",
           "Автостратегия"
+        ],
+        "x-avito-original-security": [
+          {
+            "Client Credentials": []
+          }
         ],
         "x-avito-section": {
           "slug": "autostrategy",
@@ -7369,13 +7374,18 @@
         },
         "security": [
           {
-            "Client Credentials": []
+            "ClientCredentials": []
           }
         ],
         "summary": "Создание новой кампании",
         "tags": [
           "Autostrategy",
           "Автостратегия"
+        ],
+        "x-avito-original-security": [
+          {
+            "Client Credentials": []
+          }
         ],
         "x-avito-section": {
           "slug": "autostrategy",
@@ -7461,13 +7471,18 @@
         },
         "security": [
           {
-            "Client Credentials": []
+            "ClientCredentials": []
           }
         ],
         "summary": "Редактирование кампании",
         "tags": [
           "Autostrategy",
           "Автостратегия"
+        ],
+        "x-avito-original-security": [
+          {
+            "Client Credentials": []
+          }
         ],
         "x-avito-section": {
           "slug": "autostrategy",
@@ -7574,13 +7589,18 @@
         },
         "security": [
           {
-            "Client Credentials": []
+            "ClientCredentials": []
           }
         ],
         "summary": "Получение полной информации о кампании",
         "tags": [
           "Autostrategy",
           "Автостратегия"
+        ],
+        "x-avito-original-security": [
+          {
+            "Client Credentials": []
+          }
         ],
         "x-avito-section": {
           "slug": "autostrategy",
@@ -7655,13 +7675,18 @@
         },
         "security": [
           {
-            "Client Credentials": []
+            "ClientCredentials": []
           }
         ],
         "summary": "Остановка кампании",
         "tags": [
           "Autostrategy",
           "Автостратегия"
+        ],
+        "x-avito-original-security": [
+          {
+            "Client Credentials": []
+          }
         ],
         "x-avito-section": {
           "slug": "autostrategy",
@@ -7732,13 +7757,18 @@
         },
         "security": [
           {
-            "Client Credentials": []
+            "ClientCredentials": []
           }
         ],
         "summary": "Получение списка кампаний",
         "tags": [
           "Autostrategy",
           "Автостратегия"
+        ],
+        "x-avito-original-security": [
+          {
+            "Client Credentials": []
+          }
         ],
         "x-avito-section": {
           "slug": "autostrategy",
@@ -7843,13 +7873,18 @@
         },
         "security": [
           {
-            "Client Credentials": []
+            "ClientCredentials": []
           }
         ],
         "summary": "Получение статистики по кампании",
         "tags": [
           "Autostrategy",
           "Автостратегия"
+        ],
+        "x-avito-original-security": [
+          {
+            "Client Credentials": []
+          }
         ],
         "x-avito-section": {
           "slug": "autostrategy",
@@ -7929,7 +7964,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Получение актуальных параметров Автокаталога\n",
@@ -8010,7 +8045,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Получение событий сервиса Сигнал\n",
@@ -8091,7 +8126,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Добавить идентификаторы (vin/frame) на мониторинг\n",
@@ -8153,7 +8188,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Полная очистка списка мониторинга\n",
@@ -8234,7 +8269,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Удаление идентификаторов из мониторинга (vin/frame)\n",
@@ -8301,7 +8336,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Получение событий мониторинга\n",
@@ -8397,7 +8432,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Запрос остатка отчётов пользователя\n",
@@ -8522,7 +8557,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Превью по VIN или номеру кузова\n",
@@ -8600,7 +8635,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Получение превью по его ID\n",
@@ -8710,7 +8745,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Отчет по превью\n",
@@ -8831,7 +8866,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Отчет по идентификатору авто (vin/frame)\n",
@@ -8889,7 +8924,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Получение списка отчётов\n",
@@ -9003,7 +9038,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Получение отчета по его ID\n",
@@ -9146,7 +9181,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Превью по ID объявления другой площадки\n",
@@ -9262,7 +9297,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Превью по ID объявления Авито",
@@ -9382,7 +9417,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Превью по государственному номеру\n",
@@ -9510,7 +9545,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Скоринг рисков по идентификатору авто (vin/frame)\n",
@@ -9588,7 +9623,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Получение скоринга рисков по его ID\n",
@@ -9716,7 +9751,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Запрос характеристик по регистрационному номеру\n",
@@ -9818,7 +9853,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Запрос характеристик по идентификатору авто (vin/frame)\n",
@@ -9903,7 +9938,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Получение характеристик по ID запроса\n",
@@ -10002,7 +10037,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Синхронное создание отчета по ГРЗ\n",
@@ -10086,7 +10121,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Синхронное создание отчёта по VIN или номеру кузова\n",
@@ -10206,7 +10241,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Тизер по идентификатору авто (vin/frame)\n",
@@ -10284,7 +10319,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Получение тизера по ID тизера\n",
@@ -10409,7 +10444,7 @@
         },
         "security": [
           {
-            "ClientCredentials": []
+            "ClientCredentials__autoteka": []
           }
         ],
         "summary": "Получение оценки по параметрам\n",
@@ -60678,6 +60713,16 @@
             "scopes": {
               "special_offers:sending": "Маркетинговые рассылки"
             },
+            "tokenUrl": "https://api.avito.ru/token"
+          }
+        },
+        "type": "oauth2"
+      },
+      "ClientCredentials__autoteka": {
+        "description": "Это API использует OAuth 2 с механизмом client_credentials. Используйте его для доступа к возможностям своей личной учетной записи. [Подробнее](#tag/Access)",
+        "flows": {
+          "clientCredentials": {
+            "scopes": {},
             "tokenUrl": "https://pro.autoteka.ru/token"
           }
         },
